@@ -1,2 +1,2 @@
-# Path as a sequence of position and orientations
-geometry_msgs/Pose2D[] poses
+# Path as a sequence of positions, in robot frame.
+float32[] points

@@ -22,10 +22,10 @@ from copy import deepcopy
 from path_planner import *
 from utils import *
 
-
-class Robot:
+class RobotController:
     def __init__(self, name):
         self.name = name
+        self.traj_topic = '/'+name+'/traject_points'
 
         self.odometry = Odometry()
         self.twist = Twist()
@@ -36,26 +36,24 @@ class Robot:
 
         self.goal = np.array([])
         self.traj = []
-        self.path = np.array([])
-        self.traj_mark = init_marker([1.,0.,0.])
+        self.received_path = False
 
-        self.sub = rospy.Subscriber('odom', Odometry, self.callback_odom)
-        self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.pub_traj = rospy.Publisher('/'+self.name+'/traject_points', numpy_msg(Path), queue_size=10)
-        self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Marker, queue_size=10)
+        self.sub_odom = rospy.Subscriber('odom', Odometry, self.callback_odom)
+        self.sub_path = rospy.Subscriber(self.traj_topic, numpy_msg(Path), self.callback_path)
 
+        self.pub_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        
         self.prev_goal = np.array([0, 0])
         self.change_goal = False
 
         self.look_ahead = 0.5
-        self.sample_time = 0.25
+        self.sample_time = 0.1
         self.error = 0
         self.prev_error = 0
         self.k_obstacles = 1
-        self.kP = 0.3
-        self.kD = 0
-        self.kI = 0
-
+        self.kP = 0.4
+        self.kD = 0.1
+        self.kI = 0.1
 
     def callback_odom(self,msg):
         self.odometry = msg
@@ -63,71 +61,28 @@ class Robot:
         self.pose.x = self.odometry.pose.pose.position.x
         self.pose.y = self.odometry.pose.pose.position.y
         self.pose.theta = get_yaw(self.odometry)
+    
+    def callback_path(self,msg):
+        self.traj = msg.points
+        self.received_path = True
 
-    def spin(self, map, map_info):
-        self.sub
-        self.change_goal = self.get_trajectory(map, map_info)
+    def spin(self):
+        while not self.received_path:
+                pass
 
-        if not self.change_goal:
-            #self.pure_pursuit()
-            #self.pub.publish(self.twist)
-            self.pub_traj.publish(self.path)
-            self.rviz_traj.publish(self.traj_mark)
-
-        self.prev_command = deepcopy(self.twist)
-            
+        self.sub_odom
+        self.sub_path
         
-
-    def get_trajectory(self, map, map_info):
-        if len(map.shape)==3:
-            map= map.squeeze(-1)
-            grid_img = (255 - map > 40).astype(int).astype(float)
-
-        p1 = pose_to_pixel(self.pose, map_info)
-        p2 = pose_to_pixel(self.goal.pose, map_info)
-
-        p1 = stay_in_grid(p1, grid_img)
-        p2 = stay_in_grid(p2, grid_img)
-
-        # Potential Map Saturation
-        GRIDCOSTMAP = np.clip(pyfmm.march(grid_img == 1, batch_size=10000)[0], a_min=0, a_max=20) #[xvis[0]:xvis[1], yvis[0]:yvis[1]]
-        print("iniziato A*")
-        path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)
-
-        if path is None:
-            return True
-        #grid_img[p1[0], p1[1]] = 10
-        #grid_img[p2[0], p2[1]] = 10
-        #cv2.imwrite("init_goal.png", (grid_img*25.5).astype(int))
-
-        start = time()
-        self.traj=[]
-        self.traj_mark = init_marker([1,0,0], 0.1)
-        for point in path:
-            p = Point()
-            x,y = pixel_to_pose(point, map_info)
-            p.x = y
-            p.y = x
-            self.traj_mark.points.append(p)
-
-            self.traj.append([y, x])
-            grid_img[point] = 1
-
-        traj=[]
-        for p in self.traj:
-            traj.append(rot_trasl_2D_inv(p, self.pose.theta, [self.pose.x, self.pose.y]))
-        self.path = np.ravel(traj[::-1]).astype(np.float32)
-        #cv2.imwrite("with_path.png", grid_img*255)
-        return False
-
+        self.pure_pursuit()
+        self.pub_vel.publish(self.twist)
     
     def pure_pursuit(self):
         # split trajectory coordinates (local frame)
-        traj = self.path
-        
-
+        x = self.traj[0:-2:2]
+        y = self.traj[1:-1:2]
         # Verify distance with the goal
-        dist = ( (traj[-1][0])**2 + (traj[-1][1])**2 )**0.5
+        dist = ( (x[-1])**2 + (y[-1])**2 )**0.5
+        #print("Dist: ", dist)
 
         # Follow the path carefully if the goal is close
         if dist < self.safe_dist:
@@ -138,13 +93,13 @@ class Robot:
         d_arc = 0
         step = 0
         # move about look ahead distance
-        while d_arc < look_ahead and step <= len(traj)-2:
-            d_arc += np.sqrt((traj[step+1][0] - traj[step][0])**2 + (traj[step+1][1] - traj[step][1])**2)
+        while d_arc < look_ahead and step <= len(x)-2:
+            d_arc += np.sqrt((x[step+1] - x[step])**2 + (y[step+1] - y[step])**2)
             step += 1
     
         # obtain radius of curvatur: all coordinates are already in local frame
-        L_sq = (traj[step][0])**2 + (traj[step][1])**2
-        radius = L_sq / (2 * traj[step][1])
+        L_sq = (x[step])**2 + (y[step])**2
+        radius = L_sq / (2 * y[step])
 
         # yaw = 0 in local frame
         self.error = 1/radius
@@ -159,7 +114,7 @@ class Robot:
         #    print("Stuck mode!")
         #    self.twist.linear.x = -0.1
         #    self.twist.angular.z = 0
-        #    self.pub.publish(self.twist)
+        #    self.pub_vel.publish(self.twist)
         #    sleep(1)
         #    return 0
 
@@ -175,6 +130,7 @@ class Robot:
 
         # Full speed
         else:
+            print("Full speed")
             self.twist.linear.x = self.max_vel / (1 + abs(self.twist.angular.z))**2
 
 
@@ -185,8 +141,15 @@ class Robot:
             return True
         else:
             return False
-        
-        
 
+if __name__ == "__main__":
+    name = rospy.get_param('~robot_name', "robot1")
+    rospy.init_node(name+'_control', anonymous=True)
+    controller = RobotController(name)
+    rate = rospy.Rate(10)
 
-        
+    while not rospy.is_shutdown():
+        start = time()
+        controller.spin()
+        print("Controller loop: ", time()-start, "s")
+        rate.sleep()

@@ -24,8 +24,10 @@ class TaskManager:
         self.finder = FrontierFinder()
         print("--- Initialized Finder ---")
         self.k_i = 1
-        self.k_c = 2
-        self.k_yaw = self.k_c*2
+        self.k_c = 3
+        #self.k_yaw = self.k_c*2
+        self.k_change = 5 
+
 
         robot_namelist = rospy.get_param('~robot_namelist', "robot1").split(',')
         self.robot_list = []
@@ -37,15 +39,19 @@ class TaskManager:
 
     def spin(self):
         self.finder.spin()
-        print("Il finder ha spinnato")
+        #print("Il finder ha spinnato")
         if len(self.finder.map.shape) != 2 and len(self.finder.map.shape) != 3: 
-            print("Assigner did not receive new map. Skipping loop iteration.")
+            print("Assigner did not receive a correct map. Skipping loop iteration.")
             return 0 
         if len(self.finder.frontiers.frontiers) > 0:
-            self.assigner(self.compute_rewards())
+            self.assigner()
+            
 
         for robot in self.robot_list:
-            robot.spin(copy(self.finder.map), self.finder.grid_map.info)
+            robot.spin(self.finder.map, self.finder.grid_map.info)
+
+        if len(self.finder.frontiers.frontiers) == 0:
+            rospy.signal_shutdown("All frontiers have been explored.")
     
     def compute_rewards(self):
         #for i, f in enumerate(self.finder.frontiers.frontiers):
@@ -66,24 +72,29 @@ class TaskManager:
                 f_yaw = frontier.pose.theta
 
                 info_gain = self.k_i*frontier.length
-                expl_cost = self.k_c*( np.sqrt((rx-fx)**2+(ry-fy)**2) + self.k_yaw*(r_yaw - (f_yaw+np.pi/2))  )
-                M[i,j] = info_gain - expl_cost 
+                change_cost = self.k_change* ((robot.prev_goal[0]-fx)**2 + (robot.prev_goal[1]-fy)**2  )**0.5
+                expl_cost = self.k_c*( np.sqrt((rx-fx)**2+(ry-fy)**2)   ) #+ self.k_yaw*(r_yaw - (f_yaw+np.pi/2))
+
+                M[i,j] = info_gain - expl_cost - change_cost
+                #print(info_gain, -expl_cost, -change_cost)
         return M
     
-    def assigner(self, M):
-        #print(M)
-        for i, robot in enumerate(self.robot_list):
+    def assigner(self):
+        M = self.compute_rewards()
+        for i, robot in enumerate(self.robot_list):                
             robot.goal = self.finder.frontiers.frontiers[np.argmax(M[i,:])]
-            print("Robot #", i ," ha ricevuto il target. x scelta è :", robot.goal.pose.x, ", y è: ", robot.goal.pose.y, ". L'idx è :", np.argmax(M[i,:]))
+            if robot.change_goal:
+                pass
+            #print("Robot #", i ," ha ricevuto il target. x scelta è :", robot.goal.pose.x, ", y è: ", robot.goal.pose.y, ". L'idx è :", np.argmax(M[i,:]))
             
 
 
 if __name__ == "__main__":
     rospy.init_node('assigner', anonymous=True)
     assigner = TaskManager()
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(4)
     while not rospy.is_shutdown():
         start = time()
         assigner.spin()
-        print("Main loop: ", time()-start, "s")
+        #print("Main loop: ", time()-start, "s")
         rate.sleep()

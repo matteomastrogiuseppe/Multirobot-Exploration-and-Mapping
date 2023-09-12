@@ -1,8 +1,7 @@
 import heapq
 import numpy as np
-from numba import njit
+from numba import njit, vectorize
 import matplotlib.pyplot as plt
-import pyfmm
 from time import time 
 
 @njit(cache=True)
@@ -45,8 +44,9 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
                 if value[cur_x, cur_y] + L < value[x,y]:       
                     
                     value[x,y] = value[cur_x,cur_y] + L 
-                    cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 ) # activate to get A*
-                    dist_cost = distcost(dist_cost_map, max_dist_cost,x,y, p1,k=k) # activate to get smoothed A* 
+                    cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )**2 # activate to get A*
+                    dist_cost = np.exp(distcost(dist_cost_map, max_dist_cost,x,y, k=k)) # activate to get smoothed A* 
+
                     heuristic = value[x,y]  + cart_distance + dist_cost
                     heapq.heappush(priority_queue, (heuristic, (x, y)))
                     transitions[x,y,0] = cur_x
@@ -59,16 +59,21 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
     path = []
     path.append((cur_x,cur_y))
 
+    step = 0
     while (cur_x, cur_y) != (p1[0], p1[1]):
         cur_x, cur_y = transitions[(cur_x, cur_y)]
         path.append((cur_x,cur_y))
+        step+=1
+        if step > 500:
+            return None
 
     return path
 
 @njit(cache=True)
-def distcost(map, max, x, y, p, k=1):
+def distcost(map, max, x, y, k=1):
     cost = map[x,y]
     return k*(max - cost)
+
 
 def get_xy_vision(grid, p, vision):
 

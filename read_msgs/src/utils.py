@@ -73,9 +73,21 @@ def pixel_to_pose(p, map_info):
 
 def rot_trasl_2D(p: [], theta: float, t: []):
 	"""First rotation, then translation."""
-	x = p[0]*np.cos(theta) - p[1]*np.sin(theta)
-	y = p[0]*np.sin(theta) + p[1]*np.cos(theta)
-	return np.array([x + t[0],y + t[1]])
+	R = np.array([
+		[np.cos(theta), -np.sin(theta), t[0]],
+		[np.sin(theta),  np.cos(theta), t[1]],
+		[			0, 				0,     1]
+	])
+	return (R @ np.array([p[0], p[1], 1]) )[0:2]
+
+def rot_trasl_2D_inv(p: [], theta: float, t: []):
+	"""Go to local frame from global frame."""
+	R = np.array([
+		[np.cos(theta), -np.sin(theta), t[0]],
+		[np.sin(theta),  np.cos(theta), t[1]],
+		[			0, 				0,     1]
+	])
+	return (np.linalg.inv(R) @ np.array([p[0], p[1], 1]) )[0:2]
 
 @nb.njit(cache=True)
 def stay_in_grid(p, grid):

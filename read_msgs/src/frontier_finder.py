@@ -28,8 +28,7 @@ class FrontierFinder:
 
             self.received_map = False
 
-            
-
+      
       def spin(self):
            rospy.Subscriber("map", OccupancyGrid, self.callback)
            while not self.received_map:

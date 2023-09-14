@@ -87,6 +87,7 @@
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
       <param name="Rtabmap/DetectionRate"        type="string" value="1"/>
       <param name="Grid/RayTracing"              type="string" value="true"/>
+      <param name="Grid/CellSize"                type="string" value="0.04"/>
       <param name="Grid/3D"                      type="string" value="false"/>
 
     </node>
@@ -108,7 +109,10 @@
           args="-d $(find read_msgs)/rviz/rviz_explore.rviz"/>
   </group>
 
-  <node pkg="read_msgs" type="assigner.py" name="assigner" output="screen"/>
+  <node pkg="read_msgs" type="assigner.py" name="assigner" output="screen">
+    <param name="x_pos" value="$(arg x_pos)"/>
+    <param name="y_pos" value="$(arg y_pos)"/>
+  </node>
 
 
   <node pkg="read_msgs" type="robot_control.py" name="$(arg first_tb3)_controller" output="screen">

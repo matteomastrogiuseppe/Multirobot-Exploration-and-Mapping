@@ -18,7 +18,7 @@ from visualization_msgs.msg import Marker
 import matplotlib.pyplot as plt
 
 from time import time, sleep
-from copy import deepcopy
+from copy import copy, deepcopy
 from path_planner import *
 from utils import *
 
@@ -30,11 +30,12 @@ class RobotController:
         self.odometry = Odometry()
         self.twist = Twist()
         self.prev_command = Twist()
-        self.max_vel = 0.2
-        self.safe_dist = 0.5
+        self.max_vel = 0.3
+        self.safe_dist = 2
         self.pose = Pose2D()
 
-        self.goal = np.array([])
+        self.goal = [0.,0.]
+        self.prev_goal = [0.,0.]
         self.traj = []
         self.received_path = False
 
@@ -46,14 +47,14 @@ class RobotController:
         self.prev_goal = np.array([0, 0])
         self.change_goal = False
 
-        self.look_ahead = 0.5
+        self.look_ahead = 1
         self.sample_time = 0.1
         self.error = 0
         self.prev_error = 0
         self.k_obstacles = 1
-        self.kP = 0.4
+        self.kP = 0.45
         self.kD = 0.1
-        self.kI = 0.1
+        self.kI = 1
 
     def callback_odom(self,msg):
         self.odometry = msg
@@ -68,7 +69,7 @@ class RobotController:
 
     def spin(self):
         while not self.received_path:
-                pass
+            pass
 
         self.sub_odom
         self.sub_path
@@ -77,9 +78,18 @@ class RobotController:
         self.pub_vel.publish(self.twist)
     
     def pure_pursuit(self):
+
+        paired = self.traj.reshape((int(self.traj.shape[0]/2), 2))
+        traj = []
+        for p in paired[::-1]:
+            traj.append(rot_trasl_2D_inv(p, self.pose.theta, [self.pose.x, self.pose.y]).tolist())
+
         # split trajectory coordinates (local frame)
-        x = self.traj[0:-2:2]
-        y = self.traj[1:-1:2]
+        x = [p[0] for p in traj]
+        y = [p[1] for p in traj]
+
+        self.goal = traj[-1]
+        goal_shift = ( (self.goal[0]-self.prev_goal[0])**2 + (self.goal[1]-self.prev_goal[1])**2 )**0.5
         # Verify distance with the goal
         dist = ( (x[-1])**2 + (y[-1])**2 )**0.5
         #print("Dist: ", dist)
@@ -87,6 +97,8 @@ class RobotController:
         # Follow the path carefully if the goal is close
         if dist < self.safe_dist:
             look_ahead = self.look_ahead/2
+        elif dist < self.safe_dist/2:
+            look_ahead = self.look_ahead/4
         else: 
             look_ahead = self.look_ahead 
 
@@ -108,35 +120,46 @@ class RobotController:
         self.twist.angular.z =  self.kP * self.error + \
                                 self.kD * (self.error - self.prev_error)/self.sample_time +\
                                 self.kI * (self.cumulative_error)
-        self.prev_error = self.error
+        
 
         #if self.check_if_stuck():
-        #    print("Stuck mode!")
+        #    print("Robot is stuck!")
         #    self.twist.linear.x = -0.1
         #    self.twist.angular.z = 0
         #    self.pub_vel.publish(self.twist)
         #    sleep(1)
         #    return 0
 
+        # Goal changed suddently
+        if goal_shift > 0.6: 
+            print("Sudden change in goal!")
+            self.twist.linear.x = 0.03
+            self.twist.angular.z /= 3
+
         # Goal is very close
-        if  dist < self.safe_dist/2:
-            self.twist.linear.x = 0.01
+        elif  dist < self.safe_dist/4: 
+            print("Goal close!")
+            self.twist.linear.x = 0.03
             self.twist.angular.z /= 3
         
         # Start to slow down
-        elif dist < self.safe_dist:
-            self.twist.linear.x = 0.05
+        elif dist < self.safe_dist/2:
+            print("Slowing down....")
+            self.twist.linear.x = 0.08
             self.twist.angular.z /= 2
 
         # Full speed
         else:
-            print("Full speed")
+            print("Full speed!")
             self.twist.linear.x = self.max_vel / (1 + abs(self.twist.angular.z))**2
+
+        self.prev_error = self.error
+        self.prev_goal = self.goal
 
 
     def check_if_stuck(self):   
-        print(self.odometry.twist.twist.linear.x - self.prev_command.linear.x)     
-        if abs(self.odometry.twist.twist.linear.x - self.prev_command.linear.x) > 0.1: #or \
+        #print(self.odometry.twist.twist.linear.x - self.prev_command.linear.x)     
+        if abs(self.odometry.twist.twist.linear.x - self.prev_command.linear.x) > 0.2: #or \
             #abs(self.odometry.twist.twist.angular.z - self.prev_command.angular.z) > 0.6:
             return True
         else:
@@ -151,5 +174,5 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         start = time()
         controller.spin()
-        print("Controller loop: ", time()-start, "s")
+        #print("Controller loop: ", time()-start, "s")
         rate.sleep()

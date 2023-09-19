@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Turtlebot3 -->  
-<!--
-  <include file="$(find final)/launch/multi_tb.launch">
+  <include file="$(find final)/launch/include/multi_tb.launch">
   </include>
--->
+
 
   <!-- Arguments -->
   <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
@@ -68,6 +67,7 @@
       <param name="Grid/CellSize"                type="string" value="0.05"/>
       <param name="Grid/3D"                      type="string" value="false"/>
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
+      <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>       
 
       <!-- localization mode -->
       <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
@@ -110,6 +110,7 @@
       <param name="Grid/CellSize"                type="string" value="0.05"/>
       <param name="Grid/3D"                      type="string" value="false"/>
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
+      <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>        
 
       <!-- localization mode -->
       <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
@@ -122,7 +123,7 @@
   <!-- rviz -->
   <group if="$(arg open_rviz)">
     <node pkg="rviz" type="rviz" name="rviz" required="true"
-          args="-d $(find final)/rviz/final.rviz"/>
+          args="-d $(find final)/rviz/multi.rviz"/>
   </group>
 
   <!-- Run the multirobot_map_merging node -->

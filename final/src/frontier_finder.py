@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 import rospy as rospy
-import cv2
 
 from nav_msgs.msg import OccupancyGrid
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Pose2D
-from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from read_msgs.msg import PointArray
 from read_msgs.msg import Frontier
@@ -27,7 +23,7 @@ class FrontierFinder:
             self.map          = np.array([])
 
             self.received_map = False
-            
+
       def spin(self):
            self.sub
            while not self.received_map:

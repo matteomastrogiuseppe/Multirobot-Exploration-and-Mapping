@@ -5,21 +5,12 @@ import cv2
 import pyfmm
 
 from rospy.numpy_msg import numpy_msg
-from nav_msgs.msg import OccupancyGrid
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose2D
-from geometry_msgs.msg import Pose
-from geometry_msgs.msg import Point
 from geometry_msgs.msg import Twist
-from read_msgs.msg import PointArray
-from read_msgs.msg import Path
-from visualization_msgs.msg import Marker
+from read_msgs.msg import Traj
 
-import matplotlib.pyplot as plt
-
-from time import time, sleep
-from copy import copy, deepcopy
-from path_planner import *
+from time import time
 from utils import *
 
 class RobotController:
@@ -37,7 +28,7 @@ class RobotController:
         self.received_path = False
 
         self.sub_odom = rospy.Subscriber(self.name+'/odom', Odometry, self.callback_odom)
-        self.sub_path = rospy.Subscriber(self.name+'/traject_points', numpy_msg(Path), self.callback_path)
+        self.sub_path = rospy.Subscriber(self.name+'/traject_points', numpy_msg(Traj), self.callback_path)
         self.pub_vel = rospy.Publisher(self.name+'/cmd_vel', Twist, queue_size=10)
         
         self.max_vel = 0.2

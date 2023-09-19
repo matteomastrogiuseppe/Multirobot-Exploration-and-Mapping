@@ -1,25 +1,16 @@
 #!/usr/bin/env python3
 import rospy 
 import numpy as np
-import cv2
 import pyfmm
 
 from rospy.numpy_msg import numpy_msg
-from nav_msgs.msg import OccupancyGrid
 from nav_msgs.msg import Odometry
 from nav_msgs.msg import Path 
 from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import Point
 from geometry_msgs.msg import Twist
-from read_msgs.msg import PointArray
 from read_msgs.msg import Traj
-from visualization_msgs.msg import Marker
 
-import matplotlib.pyplot as plt
-
-from time import time, sleep
-from copy import deepcopy
 from path_planner import *
 from utils import *
 
@@ -42,8 +33,6 @@ class Robot:
         self.change_goal = False
         self.x0 = 0
         self.y0 = 0
-        
-
 
         self.sub = rospy.Subscriber(self.name+'/odom', Odometry, self.callback_odom)
         self.pub_vel = rospy.Publisher(self.name+'/cmd_vel', Twist, queue_size=10)
@@ -54,7 +43,6 @@ class Robot:
         self.max_vel = 0.3
         self.safe_dist = 0.5
         self.k_obstacles = 2
-
 
 
     def callback_odom(self,msg):

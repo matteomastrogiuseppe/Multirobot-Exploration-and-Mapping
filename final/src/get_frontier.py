@@ -1,21 +1,14 @@
 #!/usr/bin/env python
-
-
-#--------Include modules---------------
 from copy import copy
 
 import numpy as np
 import cv2
 import os
-import time
 
 from utils import * 
 
 directory = os.path.dirname(os.path.abspath(__file__))
 os.chdir(directory)
-
-#-----------------------------------------------------
-
 
 def getfrontier(img, Xstart ,Ystart,resolution):
 	
@@ -44,7 +37,6 @@ def getfrontier(img, Xstart ,Ystart,resolution):
 	if len(contours)>0:
 		for i in range(0,len(contours)):
 				cnt = contours[i]
-				#start = time.time()
 				M = cv2.moments(cnt)
 				cx = int(M['m10']/M['m00'])
 				cy = int(M['m01']/M['m00'])
@@ -52,18 +44,6 @@ def getfrontier(img, Xstart ,Ystart,resolution):
 				yr=cy*resolution+Ystart				
 				theta = 0.5*np.arctan2(2*M["mu11"],M["mu20"]-M["mu02"])
 				pt=[np.array([xr,-yr,theta, cv2.arcLength(cnt,False)*resolution])]
-				#print("Time with contours: ", time.time()-start)
-
-				#start=time.time()
-				#ellipse  = cv2.fitEllipse(cnt)
-				#(x,y),(MA,ma),angle = ellipse
-				#xr2 = x*resolution+Xstart
-				#yr2 = y*resolution+Ystart
-				#length = max(MA,ma)*resolution
-				#pt=[np.array([xr2,-yr2,(angle-np.pi)*np.pi/180, length])]
-				#print("Time with ellipses: ", time.time()-start)
-				#c_list.append(ellipse)
-				#print("Xdiff: ", xr-xr2, "Ydiff: ", yr-yr2, "Thetadiff: ", theta-(angle-np.pi)/180*np.pi, "Major axis: ",max(MA,ma)*resolution)
 
 				# Reference frames (ROS and cv2) have opposite y-direction 
 				pt=[np.array([xr,-yr,theta, cv2.arcLength(cnt,False)*resolution])]
@@ -73,18 +53,5 @@ def getfrontier(img, Xstart ,Ystart,resolution):
 					all_pts=np.vstack([all_pts,pt])
 				else:
 					all_pts=pt
-
-	### Check frontiers orientation
-	#for i,c in enumerate(c_list):	
-	#	cx = c[0]
-	#	cy = c[1]	
-	#	theta = c[2]			
-	#	img2 = cv2.line(img, (int(cx-100*np.cos(theta)),int(cy-100*np.sin(theta))), (int(cx+100*np.cos(theta)),int(cy+100*np.sin(theta))), color=(0, 255, 0), thickness=2) 
-	#	theta+= np.pi/2
-	#	img2 = cv2.line(img2, (int(cx-10*np.cos(theta)),int(cy-10*np.sin(theta))), (int(cx+10*np.cos(theta)),int(cy+10*np.sin(theta))), color=(0, 125, 125), thickness=1) 
-	#	cv2.imwrite('with_points_'+str(i)+'.jpg', img2)
-	#	img2=cv2.ellipse(img,c_list[i], (0,0,255), 1)
-	#	cv2.imwrite('with_points_'+str(i)+'.jpg', img2)
-	#cv2.imwrite('with_points.jpg', img)
 
 	return all_pts

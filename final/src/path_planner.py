@@ -1,8 +1,6 @@
 import heapq
 import numpy as np
-from numba import njit, vectorize
-import matplotlib.pyplot as plt
-from time import time 
+from numba import njit
 
 @njit(cache=True)
 def A_STAR(grid, dist_cost_map, p1, p2, k):
@@ -44,9 +42,8 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
                 if value[cur_x, cur_y] + L < value[x,y]:       
                     
                     value[x,y] = value[cur_x,cur_y] + L 
-                    cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )**2 # activate to get A*
+                    cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )**2           # activate to get A*
                     dist_cost = np.exp(distcost(dist_cost_map, max_dist_cost,x,y, k=k)) # activate to get smoothed A* 
-
                     heuristic = value[x,y]  + cart_distance + dist_cost
                     heapq.heappush(priority_queue, (heuristic, (x, y)))
                     transitions[x,y,0] = cur_x

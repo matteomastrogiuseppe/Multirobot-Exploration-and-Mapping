@@ -1,0 +1,201 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+	<world name="default">
+		<!-- A global light source -->
+		
+		<include>
+			<uri>model://sun</uri>
+		</include>
+		
+		<include>
+			<uri>model://outside_floor</uri>
+				<pose>5 0 -0.01 0 0 0</pose>
+		</include>
+
+		<!--
+		<include>
+			<uri>model://QR_marker</uri>
+			    <name>QR1</name>
+			    <pose>-0.0 -1 1 0 0 0</pose>
+		</include>
+		-->
+		<include>
+			<uri>model://cpr_office</uri>
+		</include>
+
+
+		<!-- Wooden floor -->
+		
+		<!-- First Row -->
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor</name>
+			<pose>-15.0 3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor1</name>
+			<pose>-9.0 3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor2</name>
+			<pose>-3.0 3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor3</name>
+			<pose>3.0 3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor4</name>
+			<pose>9.0 3 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor5</name>
+			<pose>15.0 3 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor6</name>
+			<pose>21.0 3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor7</name>
+			<pose>27.0 3 0 0 0 0</pose>
+		</include>	
+		
+		<!-- Second Row -->
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor10</name>
+			<pose>-15.0 9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor11</name>
+			<pose>-9.0 9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor12</name>
+			<pose>-3.0 9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor13</name>
+			<pose>3.0 9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor14</name>
+			<pose>9.0 9 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor15</name>
+			<pose>15.0 9 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor16</name>
+			<pose>21.0 9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor17</name>
+			<pose>27.0 9 0 0 0 0</pose>
+		</include>
+		
+		<!-- Third Row -->
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor20</name>
+			<pose>-15.0 -3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor21</name>
+			<pose>-9.0 -3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor22</name>
+			<pose>-3.0 -3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor23</name>
+			<pose>3.0 -3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor24</name>
+			<pose>9.0 -3 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor25</name>
+			<pose>15.0 -3 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor26</name>
+			<pose>21.0 -3 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor27</name>
+			<pose>27.0 -3 0 0 0 0</pose>
+		</include>
+		
+		<!-- Fourth Row -->
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor30</name>
+			<pose>-15.0 -9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor31</name>
+			<pose>-9.0 -9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor32</name>
+			<pose>-3.0 -9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor33</name>
+			<pose>3.0 -9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor34</name>
+			<pose>9.0 -9 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor35</name>
+			<pose>15.0 -9 0 0 0 0</pose>
+		</include>		
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor36</name>
+			<pose>21.0 -9 0 0 0 0</pose>
+		</include>
+		<include>
+			<uri>model://office_floor</uri>
+			<name>floor37</name>
+			<pose>27.0 -9 0 0 0 0</pose>
+		</include>	
+		
+		
+	</world>
+</sdf>
+

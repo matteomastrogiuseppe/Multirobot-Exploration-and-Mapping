@@ -1,0 +1,8 @@
+<node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf2"  args="-urdf -model $(arg second_tb3) -x $(arg second_x_pos) -y $(arg second_y_pos) -z $(arg second_z_pos) -param robot_description" />
+
+<param name="Grid/MaxGroundAngle"          type="string" value="20"/>
+<param name="Grid/MaxObstacleHeight"       type="string" value="10"/>
+<param name="Grid/MinClusterSize"          type="string" value="5"/>
+
+<param name="GridGlobal/OccupancyThr"      type="string" value="0.41"/>
+<param name="GridGlobal/ProbHit"      type="string" value="0.9"/>

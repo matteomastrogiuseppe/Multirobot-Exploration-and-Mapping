@@ -1,0 +1,13 @@
+material QR
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture qrcode.png
+      }
+    }
+  }
+}

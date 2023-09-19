@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Turtlebot3 -->  
+<!--
+  <include file="$(find final)/launch/multi_tb.launch">
+  </include>
+-->
+
+  <!-- Arguments -->
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="open_rviz" default="true"/> <!-- set true fpr more visualization-->
+  <arg name="rtabmap_viz" default="false"/> <!-- set true fpr more visualization-->
+  <arg name="assign_rate" default="2"/>
+
+  <arg name="first_tb3"  default="tb3_0"/>
+  <arg name="second_tb3" default="tb3_1"/>
+
+  <arg name="first_tb3_x_pos" default="-0.3"/>
+  <arg name="first_tb3_y_pos" default="-0.5"/>
+  <arg name="first_tb3_z_pos" default=" 0.0"/>
+  <arg name="first_tb3_yaw"   default=" 1.57"/>
+
+  <arg name="second_tb3_x_pos" default="-1.0"/>
+  <arg name="second_tb3_y_pos" default="-0.5"/>
+  <arg name="second_tb3_z_pos" default=" 0.0"/>
+  <arg name="second_tb3_yaw"   default=" 1.57"/>
+  
+
+  <arg name="with_camera" default="true"/>
+  <arg name="localization" default="false"/>
+  <arg name="database_path" default="~/.ros/rtabmap"/>
+  <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
+  <arg unless="$(arg localization)" name="rtabmap_args" default="-d"/>
+
+
+  <group ns="rtabmap_0">
+    <node if="$(eval model=='waffle')" pkg="rtabmap_sync" type="rgbd_sync" name="rgbd_sync" output="screen">
+      <remap from="rgb/image"         to="/tb3_0/camera/rgb/image_raw"/>
+      <remap from="depth/image"       to="/tb3_0/camera/depth/image_raw"/>
+      <remap from="rgb/camera_info"   to="/tb3_0/camera/rgb/camera_info"/>
+    </node>
+
+    <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
+      <param name="database_path"       type="string" value="$(arg database_path)_0.db"/>
+      <param name="frame_id"            type="string" value="/tb3_0/base_footprint"/>
+      <param name="subscribe_rgb"   type="bool" value="false"/>
+      <param name="subscribe_depth" type="bool" value="false"/>
+      <param     if="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="true"/>
+      <param unless="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="false"/>
+      <param name="subscribe_scan"      type="bool"   value="false"/>
+      <param name="approx_sync"         type="bool"   value="true"/>
+
+
+      <!-- inputs -->
+      <remap from="scan"            to="/tb3_0/scan"/>
+      <remap from="odom"            to="/tb3_0/odom"/>
+      <remap from="rgbd_image"       to="rgbd_image"/>
+
+      <!-- output -->
+      <remap from="grid_map" to="/tb3_0/map"/>
+      
+
+      <!-- RTAB-Map's parameters -->
+      <param name="Reg/Strategy"                 type="string" value="1"/>
+      <param name="Reg/Force3DoF"                type="string" value="true"/>
+      <param name="Rtabmap/DetectionRate"        type="string" value="1"/>
+      <param name="Grid/RayTracing"              type="string" value="true"/>
+      <param name="Grid/CellSize"                type="string" value="0.05"/>
+      <param name="Grid/3D"                      type="string" value="false"/>
+      <param name="GridGlobal/MinSize"           type="string" value="20"/>
+
+      <!-- localization mode -->
+      <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+      <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+    </node>
+
+  </group>
+
+  <group ns="rtabmap_1">
+    <node if="$(eval model=='waffle')" pkg="rtabmap_sync" type="rgbd_sync" name="rgbd_sync" output="screen">
+      <remap from="rgb/image"         to="/tb3_1/camera/rgb/image_raw"/>
+      <remap from="depth/image"       to="/tb3_1/camera/depth/image_raw"/>
+      <remap from="rgb/camera_info"   to="/tb3_1/camera/rgb/camera_info"/>
+    </node>
+
+    <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
+      <param name="database_path"       type="string" value="$(arg database_path)_1.db"/>
+      <param name="frame_id"            type="string" value="/tb3_1/base_footprint"/>
+      <param name="subscribe_rgb"   type="bool" value="false"/>
+      <param name="subscribe_depth" type="bool" value="false"/>
+      <param     if="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="true"/>
+      <param unless="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="false"/>
+      <param name="subscribe_scan"      type="bool"   value="false"/>
+      <param name="approx_sync"         type="bool"   value="true"/>
+
+      <!-- inputs -->
+      <remap from="scan"            to="/tb3_1/scan"/>
+      <remap from="odom"            to="/tb3_1/odom"/>
+      <remap from="rgbd_image"       to="rgbd_image"/>
+
+      <!-- output -->
+      <remap from="grid_map" to="/tb3_1/map"/>
+      
+
+      <!-- RTAB-Map's parameters -->
+      <param name="Reg/Strategy"                 type="string" value="1"/>
+      <param name="Reg/Force3DoF"                type="string" value="true"/>
+      <param name="Rtabmap/DetectionRate"        type="string" value="1"/>
+      <param name="Grid/RayTracing"              type="string" value="true"/>
+      <param name="Grid/CellSize"                type="string" value="0.05"/>
+      <param name="Grid/3D"                      type="string" value="false"/>
+      <param name="GridGlobal/MinSize"           type="string" value="20"/>
+
+      <!-- localization mode -->
+      <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+      <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+    </node>
+
+  </group>
+
+
+  <!-- rviz -->
+  <group if="$(arg open_rviz)">
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find final)/rviz/final.rviz"/>
+  </group>
+
+  <!-- Run the multirobot_map_merging node -->
+
+  <node pkg="multirobot_map_merge" type="map_merge" respawn="false" name="map_merge">
+    <param name="robot_map_topic" value="map"/> 
+    <param name="robot_namespace" value="tb3"/>
+    <param name="merged_map_topic" value="total_map"/>
+    <param name="world_frame" value="map"/>
+    <param name="known_init_poses" value="true"/>
+    <param name="merging_rate" value="0.5"/>
+    <param name="discovery_rate" value="0.05"/>
+    <param name="estimation_rate" value="0.1"/>
+    <param name="estimation_confidence" value="1.0"/>
+  </node>
+
+    <!-- remap the individual maps from the local map (published by SLAM) to the expanded map (published by the map_expansion node)
+    <remap from = "$(arg first_tb3)/map" to = "new_tb3_0_map"/>
+    <remap from = "$(arg second_tb3)/map" to = "new_tb3_1_map"/>
+    -->
+  
+  <node pkg="final" type="assigner.py" name="assigner" output="screen">
+    <param name="robot_namelist" value="$(arg first_tb3),$(arg second_tb3)"/>
+    <param name="tb3_0_x" value="$(arg first_tb3_x_pos)"/>
+    <param name="tb3_0_y" value="$(arg first_tb3_x_pos)"/>
+    <param name="tb3_1_x" value="$(arg second_tb3_x_pos)"/>
+    <param name="tb3_1_y" value="$(arg second_tb3_x_pos)"/>
+    <param name="assign_rate" value="$(arg assign_rate)"/>
+  </node>
+
+
+  <node pkg="final" type="robot_control.py" name="$(arg first_tb3)_controller" output="screen">
+    <param name="robot_name" value="$(arg first_tb3)"/>
+  </node>
+
+
+  <node pkg="final" type="robot_control.py" name="$(arg second_tb3)_controller" output="screen">
+    <param name="robot_name" value="$(arg second_tb3)"/>
+  </node>
+</launch>

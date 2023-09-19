@@ -7,12 +7,13 @@ import pyfmm
 from rospy.numpy_msg import numpy_msg
 from nav_msgs.msg import OccupancyGrid
 from nav_msgs.msg import Odometry
+from nav_msgs.msg import Path 
 from geometry_msgs.msg import Pose2D
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Twist
 from read_msgs.msg import PointArray
-from read_msgs.msg import Path
+from read_msgs.msg import Traj
 from visualization_msgs.msg import Marker
 
 import matplotlib.pyplot as plt
@@ -27,35 +28,33 @@ class Robot:
     def __init__(self, name):
         self.name = name
 
-        self.odometry = Odometry()
-        self.twist = Twist()
-        self.prev_command = Twist()
-        self.max_vel = 0.3
-        self.safe_dist = 0.5
-        self.pose = Pose2D()
+        self.odometry       = Odometry()
+        self.twist          = Twist()
+        self.prev_command   = Twist()
+        self.pose           = Pose2D()
+        self.path_pub = Path()
+        self.path_pub.header.frame_id="odom"
 
-        self.goal = np.array([])
-        self.traj = []
-        self.path = np.array([])
-        self.traj_mark = init_marker([1.,0.,0.])
+        self.goal           = np.array([])
+        self.prev_goal      = np.array([0, 0])
+        self.path           = np.array([])
+
+        self.change_goal = False
+        self.x0 = 0
+        self.y0 = 0
+        
+
 
         self.sub = rospy.Subscriber('odom', Odometry, self.callback_odom)
-        self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.pub_traj = rospy.Publisher('/'+self.name+'/traject_points', numpy_msg(Path), queue_size=10)
-        self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Marker, queue_size=10)
+        self.pub_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.pub_traj = rospy.Publisher('/'+self.name+'/traject_points', numpy_msg(Traj), queue_size=10)
+        self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Path, queue_size=10)
 
-        self.prev_goal = np.array([0, 0])
-        self.change_goal = False
-        self.stop_robot = False
+        
+        self.max_vel = 0.3
+        self.safe_dist = 0.5
+        self.k_obstacles = 2
 
-        self.look_ahead = 0.5
-        self.sample_time = 0.25
-        self.error = 0
-        self.prev_error = 0
-        self.k_obstacles = 1
-        self.kP = 0.3
-        self.kD = 0
-        self.kI = 0
 
 
     def callback_odom(self,msg):
@@ -67,15 +66,12 @@ class Robot:
 
     def spin(self, map, map_info):
         self.sub
-        if self.goal is None:
-            self.stop_robot = True
         self.change_goal = self.get_trajectory(map, map_info)
 
         if not self.change_goal:
             self.pub_traj.publish(self.path)
-            self.rviz_traj.publish(self.traj_mark)
+            self.rviz_traj.publish(self.path_pub)
 
-        self.prev_command = deepcopy(self.twist)
         self.prev_goal = np.array([self.goal.pose.x, self.goal.pose.y])
             
 
@@ -91,27 +87,28 @@ class Robot:
         p2 = stay_in_grid(p2, grid_img)
 
         # Potential Map and Saturation
-        GRIDCOSTMAP = np.clip(pyfmm.march(grid_img == 1, batch_size=10000)[0], a_min=0, a_max=10) #[xvis[0]:xvis[1], yvis[0]:yvis[1]]
-        #print("iniziato A*")
+        GRIDCOSTMAP = np.clip(pyfmm.march(grid_img == 1, batch_size=10000)[0], a_min=0, a_max=12.5)
         path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)
 
         if path is None:
             return True
 
-        start = time()
-        self.traj=[]
-        self.traj_mark = init_marker([1,0,0], 0.1)
+        trajectory=[]
+        self.path_pub.poses=[]
         for point in path:
-            p = Point()
             x,y = pixel_to_pose(point, map_info)
-            p.x = y
-            p.y = x
-            self.traj_mark.points.append(p)
 
-            self.traj.append([y, x])
+            posuccia = PoseStamped()            
+            posuccia.pose.orientation.w = 1
+            posuccia.pose.position.x = y
+            posuccia.pose.position.y = x
+            posuccia.pose.position.z = 0
+
+            trajectory.append([y, x])
+            self.path_pub.poses.append(posuccia)
             #grid_img[point] = 1
 
-        self.path = np.ravel(self.traj).astype(np.float32)
+        self.path = np.ravel(trajectory).astype(np.float32)
         #cv2.imwrite("with_path.png", grid_img*255)
         return False        
         

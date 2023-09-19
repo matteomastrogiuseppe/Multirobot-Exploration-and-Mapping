@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rospy as rospy
 import cv2 
+import rosnode
 
 from nav_msgs.msg           import OccupancyGrid
 from nav_msgs.msg           import Odometry
@@ -8,12 +9,12 @@ from geometry_msgs.msg      import Pose2D
 from geometry_msgs.msg      import Pose
 from geometry_msgs.msg      import Point
 from read_msgs.msg          import PointArray
+from read_msgs.msg          import Frontier
 from visualization_msgs.msg import Marker
 
 from time                   import time, sleep
 from copy                   import copy
 
-from get_frontier           import getfrontier
 from frontier_finder        import FrontierFinder
 from robot                  import Robot
 from utils                  import *
@@ -23,30 +24,31 @@ class TaskManager:
     def __init__(self):
         self.finder = FrontierFinder()
         print("--- Initialized Finder ---")
-        self.k_i = 1
-        self.k_c = 3
-        #self.k_yaw = self.k_c*2
-        self.k_change = 1
 
+        # Assigner gains 
+        self.k_i = 0.9
+        self.k_c = 3
+        self.k_change = 1
 
         robot_namelist = rospy.get_param('~robot_namelist', "robot1").split(',')
         self.robot_list = []
         for i in range(len(robot_namelist)):
-            self.robot_list.append(Robot(robot_namelist[i]))
+            r = Robot(robot_namelist[i])
+            r.x0 = rospy.get_param('~'+r.name+'_x', default=0.)
+            r.y0 = rospy.get_param('~'+r.name+'_y', default=0.)
+            self.robot_list.append(r)
         print("--- Created Robots ---")
 
         
 
-    def spin(self):
+    def spin(self):        
         self.finder.spin()
         #print("Il finder ha spinnato")
         if len(self.finder.map.shape) != 2 and len(self.finder.map.shape) != 3: 
             print("Assigner did not receive a correct map. Skipping loop iteration.")
             return 0 
-        if len(self.finder.frontiers.frontiers) > 0:
-            self.assigner()
-
-
+        
+        self.assigner()
         for robot in self.robot_list:
             robot.spin(self.finder.map, self.finder.grid_map.info)
 
@@ -79,18 +81,34 @@ class TaskManager:
         if len(self.finder.frontiers.frontiers) == 0:
             print("Finished exploring frontiers, going back to the original position...")
             finished = True
-                #else:
-        #    rospy.signal_shutdown("All frontiers have been explored.")
 
-        for i, robot in enumerate(self.robot_list):        
+
+        for i, robot in enumerate(self.robot_list):      
+
+            # If all frontiers have been explored, go back to original position.
             if finished:
-                msg = Pose2D()
-                msg.x = rospy.get_param('~x_pos', default=0.)
-                msg.y = rospy.get_param('~y_pos', default=0.)
-                robot.goal = None 
+                msg = Frontier()
+                msg.pose.x = robot.x0
+                msg.pose.y = robot.y0
+                robot.goal = msg
+                
+                # Shutdown robot when back to original position.
+                if abs(robot.pose.x - robot.x0) < 0.1 and \
+                   abs(robot.pose.y - robot.y0) < 0.1:
+                    robot.shutdown = True
+                    print("All frontiers have been explored and robot: \""+robot.name+"\" is back to initial position.")
+                    print("Shutting down robot: \""+robot.name+"\".")
+                    rosnode.kill_nodes([robot.name+'_controller'])                  
+                    robot.twist.linear.x = 0
+                    robot.twist.angular.z = 0
+                    robot.pub_vel.publish(robot.twist)
+
             else:       
-                robot.goal = self.finder.frontiers.frontiers[np.argmax(M[i,:])]
-            #print(np.argmax(M[i,:]))
+                # Assign best frontier
+                f_idx = np.argmax(M[i,:])
+                robot.goal = self.finder.frontiers.frontiers[f_idx]
+                M[:,f_idx] = - np.inf
+
             if robot.change_goal:
                 pass
             #print("Robot #", i ," ha ricevuto il target. x scelta è :", robot.goal.pose.x, ", y è: ", robot.goal.pose.y, ". L'idx è :", np.argmax(M[i,:]))
@@ -100,9 +118,9 @@ class TaskManager:
 if __name__ == "__main__":
     rospy.init_node('assigner', anonymous=True, disable_signals=True)
     assigner = TaskManager()
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(rospy.get_param('~assign_rate', default=1))
     while not rospy.is_shutdown():
         start = time()
         assigner.spin()
-        #print("Main loop: ", time()-start, "s")
+        print("Main loop: ", time()-start, "s")
         rate.sleep()

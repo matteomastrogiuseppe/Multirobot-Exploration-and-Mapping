@@ -53,7 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    PointArray.msg
    Frontier.msg
-   Path.msg
+   Traj.msg
  )
 
 ## Generate services in the 'srv' folder

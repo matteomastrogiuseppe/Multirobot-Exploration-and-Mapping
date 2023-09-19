@@ -30,10 +30,8 @@ class RobotController:
         self.odometry = Odometry()
         self.twist = Twist()
         self.prev_command = Twist()
-        self.max_vel = 0.3
-        self.safe_dist = 2
         self.pose = Pose2D()
-
+        
         self.goal = [0.,0.]
         self.prev_goal = [0.,0.]
         self.traj = []
@@ -41,13 +39,12 @@ class RobotController:
 
         self.sub_odom = rospy.Subscriber('odom', Odometry, self.callback_odom)
         self.sub_path = rospy.Subscriber(self.traj_topic, numpy_msg(Path), self.callback_path)
-
         self.pub_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         
-        self.prev_goal = np.array([0, 0])
-        self.change_goal = False
-
-        self.look_ahead = 1
+        self.max_vel = 0.2
+        self.max_ang_vel = 1
+        self.safe_dist = 2
+        self.look_ahead = 0.7
         self.sample_time = 0.1
         self.error = 0
         self.prev_error = 0
@@ -74,6 +71,7 @@ class RobotController:
         self.sub_odom
         self.sub_path
         
+        
         self.pure_pursuit()
         self.pub_vel.publish(self.twist)
     
@@ -92,7 +90,6 @@ class RobotController:
         goal_shift = ( (self.goal[0]-self.prev_goal[0])**2 + (self.goal[1]-self.prev_goal[1])**2 )**0.5
         # Verify distance with the goal
         dist = ( (x[-1])**2 + (y[-1])**2 )**0.5
-        #print("Dist: ", dist)
 
         # Follow the path carefully if the goal is close
         if dist < self.safe_dist:
@@ -100,7 +97,7 @@ class RobotController:
         elif dist < self.safe_dist/2:
             look_ahead = self.look_ahead/4
         else: 
-            look_ahead = self.look_ahead 
+            look_ahead = 0.7
 
         d_arc = 0
         step = 0
@@ -131,28 +128,29 @@ class RobotController:
         #    return 0
 
         # Goal changed suddently
-        if goal_shift > 0.6: 
-            print("Sudden change in goal!")
-            self.twist.linear.x = 0.03
+        if goal_shift > 0.5: 
+            #print("Sudden change in goal!")
+            self.twist.linear.x = 0.05
             self.twist.angular.z /= 3
 
-        # Goal is very close
-        elif  dist < self.safe_dist/4: 
-            print("Goal close!")
-            self.twist.linear.x = 0.03
-            self.twist.angular.z /= 3
-        
         # Start to slow down
         elif dist < self.safe_dist/2:
-            print("Slowing down....")
+            #print("Slowing down....")
             self.twist.linear.x = 0.08
             self.twist.angular.z /= 2
 
-        # Full speed
+        # Goal is very close
+        elif  dist < self.safe_dist/4: 
+            #print("Goal close!")
+            self.twist.linear.x = 0.02
+            self.twist.angular.z /= 3
         else:
-            print("Full speed!")
-            self.twist.linear.x = self.max_vel / (1 + abs(self.twist.angular.z))**2
+            self.twist.linear.x = self.max_vel            
 
+        self.twist.linear.x = self.twist.linear.x / (1 + abs(self.twist.angular.z))**2
+
+        # Velocity Saturation
+        self.twist.angular.z = max(-self.max_ang_vel, min(self.max_ang_vel, self.twist.angular.z))
         self.prev_error = self.error
         self.prev_goal = self.goal
 
@@ -176,3 +174,4 @@ if __name__ == "__main__":
         controller.spin()
         #print("Controller loop: ", time()-start, "s")
         rate.sleep()
+    

@@ -11,8 +11,6 @@ from time import time, sleep
 from copy import copy
 from utils import *
 
-
-
 class FrontierFinder:
       def __init__(self):
             self.sub          = rospy.Subscriber("total_map", OccupancyGrid, self.callback)
@@ -40,13 +38,12 @@ class FrontierFinder:
             points = getfrontier(copy(self.map), 
                                  Xstart   =self.grid_map.info.origin.position.x,
                                  Ystart   =self.grid_map.info.origin.position.y,
-                                 resolution=self.grid_map.info.resolution
-                                 )
+                                 resolution=self.grid_map.info.resolution)
+            
             self.markers = init_marker()
             self.frontiers.frontiers = []
 
             for point in points:
-
                   p = Point()
                   p.x = point[0]
                   p.y = point[1]

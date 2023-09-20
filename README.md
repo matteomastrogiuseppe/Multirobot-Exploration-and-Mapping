@@ -1,12 +1,19 @@
 # Multirobot Exploration and Mapping
 
 ## Project Overview:
+To obtain an accurate Point Cloud map of the environment visited the solution by [IntRoLab](https://github.com/introlab) was used. In particular the solution offered by [rtabmap_ros](https://github.com/introlab/rtabmap_ros) allows a seamless integration of the library directly in `ROS`.
+
+The information connected to the point cloud will be stored into a database `.db` file. In order to obtain the final Point Cloud run the following module in a bash terminal 
+
+```bash
+rtabmap-databaseViewer
+```
 
 _TBD_
 
-## Installation Steps
+## Installation Steps:
 
-### _ROS Version_ Required: Noetic on Ubuntu 20.04
+### _ROS Version_ and _OS_: Noetic on Ubuntu 20.04
 
 Installation procedure:
 
@@ -58,7 +65,7 @@ source ~/.bashrc
 
 For the first development it is necessary the `TurtleBot` environment.
 
-Either follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian:
+Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian:
 
 ```bash
 sudo apt-get install ros-noetic-turtlebot3 apt-get install ros-noetic-turtlebot3-gazebo 
@@ -71,39 +78,32 @@ echo "export TURTLEBOT3_MODEL=waffle" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-
-### RTAB-Map ICP Poit Cloud
-
-To obtain an accurate Point Cloud map of the environment visited the solution by [IntRoLab](https://github.com/introlab) was used. In particular the solution offered by [rtabmap_ros](https://github.com/introlab/rtabmap_ros) allows a seamless integration of the library directly in `ROS`.
-
-To use this solution, run the following bash code to install the dependencies
+### RTAB-Map and Map Merge:
+Run the following bash code to install RTAB-Map:
 ```bash
-sudo apt install ros-noetic-turtlebot3-simulations ros-noetic-turtlebot3-navigation ros-noetic-dwa-local-planner
-```
-or follow the installation instruction at the official page for the [noetic version](https://github.com/introlab/rtabmap_ros/tree/noetic-devel).
-
-In order to use this module run the following bash code after running the code in the previous sections
-
-```bash
-roslaunch rtabmap_demos demo_turtlebot3_navigation.launch
+sudo apt install ros-$ROS_DISTRO-rtabmap-ros
 ```
 
-The information connected to the point cloud will be stored into a database `.db` file. In order to obtain the final Point Cloud run the following module in a bash terminal 
-
+_multirobot_map_merge_ was used to merge the robot individual maps.
 ```bash
-rtabmap-databaseViewer
+sudo apt install ros-$ROS_DISTRO-multirobot-map-merge
 ```
 
-### Try the installaion
-
-To try the correct installation run
-
+### Python 
+Install Python 3.8 with the following command:
 ```bash
-roslaunch multi_mapping turtlebot3_visp_world.launch
+sudo apt install python3.8
+sudo apt install python3-pip
+```
+Install the required libraries:
+```bash
+pip3 install numpy cv2 numba pyfmm
 ```
 
-and in a different terminal, in order to move he robot
+## Try the installation
+
+To try the correct installation, run:
 
 ```bash
-roslaunch turtlebot3_teleop turtlebot3_teleop_key.launch
+roslaunch multi_explore multi.launch
 ```

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import rospy 
 import numpy as np
-import cv2
-import pyfmm
 
 from rospy.numpy_msg import numpy_msg
 from nav_msgs.msg import Odometry
@@ -30,15 +28,16 @@ class RobotController:
         self.sub_path = rospy.Subscriber(self.name+'/traject_points', numpy_msg(Traj), self.callback_path)
         self.pub_vel  = rospy.Publisher(self.name+'/cmd_vel', Twist, queue_size=10)
         
+        # Robot coefficients
         self.max_vel        = 0.2
         self.max_ang_vel    = 1
         self.safe_dist      = 1.1
         self.look_ahead     = 0.7
         self.sample_time    = 0.1
 
+        # PID Controller gains and variables 
         self.error = 0
         self.prev_error = 0
-        self.k_obstacles = 1
         self.kP = 0.45
         self.kD = 0.3
         self.kI = 1
@@ -58,6 +57,7 @@ class RobotController:
         self.sub_odom
         self.sub_path
         
+        # Wait for a path
         while not self.received_path:
             pass
         
@@ -65,7 +65,8 @@ class RobotController:
         self.pub_vel.publish(self.twist)
     
     def pure_pursuit(self):
-        # Trajectory data was raveled before publishing
+        # Trajectory data was raveled before publishing. Go back to [x,y] pairs,
+        # but in robot reference frame!
         paired = self.traj.reshape((int(self.traj.shape[0]/2), 2))
         traj = []
         for p in paired[::-1]:
@@ -75,8 +76,10 @@ class RobotController:
         x = [p[0] for p in traj]
         y = [p[1] for p in traj]
 
+        # Keep track of the difference from previous and new goal. Slow down if large.
         self.goal = traj[-1]
         goal_shift = ( (self.goal[0]-self.prev_goal[0])**2 + (self.goal[1]-self.prev_goal[1])**2 )**0.5
+
         # Verify distance with the goal
         dist = ( (x[-1])**2 + (y[-1])**2 )**0.5
 
@@ -95,7 +98,7 @@ class RobotController:
             d_arc += np.sqrt((x[step+1] - x[step])**2 + (y[step+1] - y[step])**2)
             step += 1
     
-        # obtain radius of curvatur: all coordinates are already in local frame
+        # obtain radius of curvature: all coordinates are already in local frame
         L_sq = (x[step])**2 + (y[step])**2
         radius = L_sq / (2 * y[step])
 
@@ -107,7 +110,7 @@ class RobotController:
                                 self.kD * (self.error - self.prev_error)/self.sample_time +\
                                 self.kI * (self.cumulative_error)
         
-
+        ## Set linear velocity and adjust angular depending on the situation
         # Goal changed suddently
         if goal_shift > 0.5: 
             #print("Sudden change in goal!")
@@ -128,10 +131,13 @@ class RobotController:
         else:
             self.twist.linear.x = self.max_vel            
 
+        # Slow down if large angular twist
         self.twist.linear.x = self.twist.linear.x / (1 + abs(self.twist.angular.z))**2
 
         # Velocity Saturation
         self.twist.angular.z = max(-self.max_ang_vel, min(self.max_ang_vel, self.twist.angular.z))
+
+        # Update
         self.prev_error = self.error
         self.prev_goal = self.goal
 

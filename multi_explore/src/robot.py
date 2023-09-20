@@ -32,7 +32,6 @@ class Robot:
         self.goal           = np.array([])
         self.prev_goal      = np.array([0, 0])
         self.path           = np.array([])
-        self.stop_before = 5
 
         self.change_goal = False
         self.shutdown = False
@@ -44,9 +43,7 @@ class Robot:
         self.pub_traj = rospy.Publisher('/'+self.name+'/traject_points', numpy_msg(Traj), queue_size=10)
         self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Path, queue_size=10)
 
-        
-        self.max_vel = 0.3
-        self.safe_dist = 0.5
+        # Obstacle avoidance gain
         self.k_obstacles = 2
 
 
@@ -69,15 +66,21 @@ class Robot:
             
 
     def get_trajectory(self, map, map_info, other_poses):
+
         if len(map.shape)==3:
             map= map.squeeze(-1)
-            grid_img = (255 - map > 40).astype(int).astype(float)
 
+        # Convert gray-scale img in a binary image (obstacles and unexplored --> 1)
+        grid_img = (255 - map > 40).astype(int).astype(float)
+
+        # Convert /map coordinates to pixel coordinates
         p1 = pose_to_pixel(self.pose, map_info)
         p2 = pose_to_pixel(self.goal.pose, map_info)
 
+        # Adjust gridmap to avoid colliding with other robots
         grid_img = self.avoid_other_robots(other_poses, grid_img, map_info)
 
+        # Make sure starting point and goal are in the grid (they could be on the edge)
         p1 = stay_in_grid(p1, grid_img)
         p2 = stay_in_grid(p2, grid_img)
 
@@ -87,6 +90,8 @@ class Robot:
         #plt.imshow(GRIDCOSTMAP, interpolation='None')
         #plt.colorbar()
         #plt.savefig("costmap.png")
+
+        # A* path planning, as list of points, in image pixels
         path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)
 
         if path is None:
@@ -103,12 +108,16 @@ class Robot:
             posuccia.pose.position.y = x
             posuccia.pose.position.z = 0
 
+            # Trajectory in /map coordinates
             trajectory.append([y, x])
+            # For RViz visualisation
             self.path_pub.poses.append(posuccia)
-            #grid_img[point] = 1
+            
         #if len(trajectory) < self.stop_before: pass
         #else: 
         #    trajectory = trajectory[:-self.stop_before]
+
+        # Ravel the trajectory to easily send it as ROS message
         self.path = np.ravel(trajectory).astype(np.float32)
         #cv2.imwrite("with_path.png", grid_img*255)
         return False        

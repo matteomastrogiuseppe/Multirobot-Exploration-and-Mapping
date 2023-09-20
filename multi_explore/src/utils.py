@@ -28,6 +28,7 @@ def init_marker(rgb=[0,1,0], scale = 0.2):
 
 @nb.njit(cache=True)
 def create_map_raw(data,h,w):
+	"""Create gray-scale image from Occupancy-Grid data."""
 	img = np.zeros((h, w, 1), np.uint8)
 	for i in range(h):
 		for j in range(w):
@@ -40,13 +41,15 @@ def create_map_raw(data,h,w):
 	return img
 	
 def get_yaw(msg):
-      _, _, yaw = euler_from_quaternion([msg.pose.pose.orientation.x,
+	"""Get yaw from odometry msg."""
+	_, _, yaw = euler_from_quaternion([msg.pose.pose.orientation.x,
 						      msg.pose.pose.orientation.y,
 						      msg.pose.pose.orientation.z,
 						      msg.pose.pose.orientation.w])
-      return yaw
+	return yaw
 
 def pose_to_pixel(pose: Pose2D(), map_info):
+	"""Based on the map specifications, obtain pixel coordinate from /map coordinates."""
 	x_origin = map_info.origin.position.x
 	y_origin = map_info.origin.position.y
 	res = map_info.resolution
@@ -55,6 +58,7 @@ def pose_to_pixel(pose: Pose2D(), map_info):
 	return np.array([py, px])
 
 def pixel_to_pose(p, map_info):
+	"""Get global (/map) coordinates from pixel."""
 	x_origin = map_info.origin.position.x
 	y_origin = map_info.origin.position.y
 	res = map_info.resolution
@@ -64,7 +68,7 @@ def pixel_to_pose(p, map_info):
 	return np.array([xr, yr])
 
 def rot_trasl_2D(p, theta, t):
-	"""First rotation, then translation."""
+	"""First rotation, then translation. (local-->global frame)"""
 	R = np.array([
 		[np.cos(theta), -np.sin(theta), t[0]],
 		[np.sin(theta),  np.cos(theta), t[1]],

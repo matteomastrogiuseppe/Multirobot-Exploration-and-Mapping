@@ -15,32 +15,41 @@ def getfrontier(img, Xstart ,Ystart,resolution):
 
 	# Get obstacles (value 0 in the gray-scale img)
 	obstacles =cv2.inRange(img,0,1)
+
+	# Edges detector, first frontiers
 	edges = cv2.Canny(img,0,255)
+	
+	# Draw around obstacles contours to filter wrong frontiers
 	large_obst, _ = cv2.findContours(obstacles,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	cv2.drawContours(obstacles, large_obst, -1, (255,255,255), 8)
-	clean =cv2.bitwise_not(obstacles) 
 
+	# Get frontiers as edges but filtering obstacles
+	clean =cv2.bitwise_not(obstacles) 
 	frontiers = cv2.bitwise_and(clean,edges)
+
+	# Get frontiers centroids
 	contours, _ = cv2.findContours(frontiers,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	cv2.drawContours(frontiers, contours, -1, (255,255,255), 2)
 	# Further filtering
 	contours, _ = cv2.findContours(frontiers,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-	#cv2.imwrite('Frontiers.jpg', frontiers)
 
 	# Contours to frontiers centroids
 	all_pts=[]
 	if len(contours)>0:
 		for i in range(0,len(contours)):
 				cnt = contours[i]
+				# Get centroid using img moments
 				M = cv2.moments(cnt)
 				cx = int(M['m10']/M['m00'])
 				cy = int(M['m01']/M['m00'])
+				# Conversion to /map points
 				xr=cx*resolution+Xstart
-				yr=cy*resolution+Ystart				
+				yr=cy*resolution+Ystart			
+				# Orientation of the frontier, could be useful.	
 				theta = 0.5*np.arctan2(2*M["mu11"],M["mu20"]-M["mu02"])
-				pt=[np.array([xr,-yr,theta, cv2.arcLength(cnt,False)*resolution])]
 
-				# Reference frames (ROS and cv2) have opposite y-direction 
+				# Reference frames (ROS and cv2) have opposite y-direction.
+				# Return frontier centroid, orientation and length of contour. 
 				pt=[np.array([xr,-yr,theta, cv2.arcLength(cnt,False)*resolution])]
 				
 				img = cv2.circle(img, (cx,cy), radius=3, color=(0, 0, 255), thickness=-1)

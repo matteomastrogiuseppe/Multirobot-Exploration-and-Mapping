@@ -15,14 +15,14 @@ _TBD_
 
 ### _ROS Version_ and _OS_: Noetic on Ubuntu 20.04
 
-Installation procedure:
+Install ROS Noetic:
 
 ```bash
 sudo apt update
 sudo sudo apt install ros-noetic-desktop
 ```
 
-Source the environment:
+Source the ROS environment:
 
 ```bash
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
@@ -63,7 +63,7 @@ source ~/.bashrc
 
 ### TurtleBot Environment
 
-For the first development it is necessary the `TurtleBot` environment.
+For a first development, the `TurtleBot` environment was used.
 
 Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian:
 

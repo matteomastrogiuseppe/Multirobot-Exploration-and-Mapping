@@ -4,9 +4,9 @@
 
 _TBD_
 
-## Installation Requirements
+## Installation Steps
 
-- _ROS Version_ Required: Noetic on Ubuntu 20.04
+### _ROS Version_ Required: Noetic on Ubuntu 20.04
 
 Installation procedure:
 
@@ -28,44 +28,48 @@ sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control
 sudo apt-get install ros-noetic-rviz
 ```
 
-## Installation Steps
+
+### Create ROS Workspace
+Create the **catkin_ws** workspace:
+
+```bash
+mkdir -p ~/turtle_ws/src
+```
+
+**Clone** the project repository in the "src" folder:
+```bash
+cd ~/turtle_ws/src
+git clone https://github.com/matteomastrogiuseppe/Multirobot-Exploration-and-Mapping
+```
+
+**Build** the workspace and packages:
+```bash
+cd ~/turtle_ws
+catkin_make
+```
+
+Remember to **source** this workspace by editing the .bashrc file:
+```bash
+echo "source ~/turtle_ws/devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
 
 ### TurtleBot Environment
 
 For the first development it is necessary the `TurtleBot` environment.
 
-Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation) and change _catkin_ws_ with _turtle_ws_
-
-Make sure to add
+Either follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian:
 
 ```bash
-export TURTLEBOT3_MODEL=waffle
+sudo apt-get install ros-noetic-turtlebot3 apt-get install ros-noetic-turtlebot3-gazebo 
 ```
 
-to your _.bashrc_ file
-
-Remember to source this workspace by adding
+Make sure to add the Turtlebot model to the .bashrc file:
 
 ```bash
-source ~/turtle_ws/devel/setup.bash
+echo "export TURTLEBOT3_MODEL=waffle" >> ~/.bashrc
+source ~/.bashrc
 ```
-
-to your _.bashrc_ file
-
-
-### QR-code Maker
-
-#### 1. Copy the existing Arena
-
-In order to display the correct QR codes in the TurtleBot environment, copy and past the folder
-
-```bash
-turtle_ws/src/turtlebot3_simulations/turtlebot3_gazebo/worlds
-turtle_ws/src/turtlebot3_simulations/turtlebot3_gazebo/models
-turtle_ws/src/turtlebot3_simulations/turtlebot3_gazebo/launch
-```
-
-into your workspace at the defined positions. In this way you will obtain the QR codes positioned in the TurtleBot Arena.
 
 
 ### RTAB-Map ICP Poit Cloud

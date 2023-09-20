@@ -74,7 +74,6 @@
       <param name="Reg/Strategy"                 type="string" value="1"/>
       <param name="Reg/Force3DoF"                type="string" value="true"/>
       
-      
       <param name="Rtabmap/DetectionRate"        type="string" value="1"/>
       <param name="Grid/RayTracing"              type="string" value="true"/>
       <param name="Grid/CellSize"                type="string" value="0.05"/>

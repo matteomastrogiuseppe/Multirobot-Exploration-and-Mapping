@@ -8,7 +8,7 @@ from rospy.numpy_msg import numpy_msg
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import Twist
-from read_msgs.msg import Traj
+from multi_explore.msg import Traj
 
 from time import time
 from utils import *
@@ -19,28 +19,28 @@ class RobotController:
 
         self.odometry = Odometry()
         self.twist = Twist()
-        self.prev_command = Twist()
         self.pose = Pose2D()
         
-        self.goal = [0.,0.]
+        self.goal      = [0.,0.]
         self.prev_goal = [0.,0.]
         self.traj = []
         self.received_path = False
 
         self.sub_odom = rospy.Subscriber(self.name+'/odom', Odometry, self.callback_odom)
         self.sub_path = rospy.Subscriber(self.name+'/traject_points', numpy_msg(Traj), self.callback_path)
-        self.pub_vel = rospy.Publisher(self.name+'/cmd_vel', Twist, queue_size=10)
+        self.pub_vel  = rospy.Publisher(self.name+'/cmd_vel', Twist, queue_size=10)
         
-        self.max_vel = 0.2
-        self.max_ang_vel = 1
-        self.safe_dist = 2
-        self.look_ahead = 0.7
-        self.sample_time = 0.1
+        self.max_vel        = 0.2
+        self.max_ang_vel    = 1
+        self.safe_dist      = 1.1
+        self.look_ahead     = 0.7
+        self.sample_time    = 0.1
+
         self.error = 0
         self.prev_error = 0
         self.k_obstacles = 1
         self.kP = 0.45
-        self.kD = 0.1
+        self.kD = 0.3
         self.kI = 1
 
     def callback_odom(self,msg):
@@ -65,7 +65,7 @@ class RobotController:
         self.pub_vel.publish(self.twist)
     
     def pure_pursuit(self):
-
+        # Trajectory data was raveled before publishing
         paired = self.traj.reshape((int(self.traj.shape[0]/2), 2))
         traj = []
         for p in paired[::-1]:
@@ -82,9 +82,9 @@ class RobotController:
 
         # Follow the path carefully if the goal is close
         if dist < self.safe_dist:
-            look_ahead = self.look_ahead/2
-        elif dist < self.safe_dist/2:
             look_ahead = self.look_ahead/4
+        elif dist < self.safe_dist/2:
+            look_ahead = self.look_ahead/8
         else: 
             look_ahead = 0.7
 
@@ -107,14 +107,6 @@ class RobotController:
                                 self.kD * (self.error - self.prev_error)/self.sample_time +\
                                 self.kI * (self.cumulative_error)
         
-
-        #if self.check_if_stuck():
-        #    print("Robot is stuck!")
-        #    self.twist.linear.x = -0.1
-        #    self.twist.angular.z = 0
-        #    self.pub_vel.publish(self.twist)
-        #    sleep(1)
-        #    return 0
 
         # Goal changed suddently
         if goal_shift > 0.5: 
@@ -144,13 +136,6 @@ class RobotController:
         self.prev_goal = self.goal
 
 
-    def check_if_stuck(self):   
-        #print(self.odometry.twist.twist.linear.x - self.prev_command.linear.x)     
-        if abs(self.odometry.twist.twist.linear.x - self.prev_command.linear.x) > 0.2: #or \
-            #abs(self.odometry.twist.twist.angular.z - self.prev_command.angular.z) > 0.6:
-            return True
-        else:
-            return False
 
 if __name__ == "__main__":
     rospy.init_node('control', anonymous=True)

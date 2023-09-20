@@ -14,12 +14,12 @@
   <arg name="second_tb3_yaw"   default=" 1.57"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
-    <arg name="paused" value="false"/>
-    <arg name="use_sim_time" value="true"/>
-    <arg name="gui" value="false"/>
-    <arg name="headless" value="false"/>
-    <arg name="debug" value="false"/>
+    <arg name="world_name"    value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
+    <arg name="paused"        value="false"/>
+    <arg name="use_sim_time"  value="true"/>
+    <arg name="gui"           value="false"/>
+    <arg name="headless"      value="false"/>
+    <arg name="debug"         value="false"/>
   </include>  
 
   <group ns = "$(arg first_tb3)">

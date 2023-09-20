@@ -3,8 +3,8 @@ import rospy as rospy
 
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import Point
-from read_msgs.msg import PointArray
-from read_msgs.msg import Frontier
+from multi_explore.msg import PointArray
+from multi_explore.msg import Frontier
 from visualization_msgs.msg import Marker
 from get_frontier import getfrontier
 from time import time, sleep
@@ -24,8 +24,10 @@ class FrontierFinder:
 
       def spin(self):
            self.sub
+           # Wait for publishing of map
            while not self.received_map:
                 pass
+           
            self.get_frontier() 
            self.pub_rviz.publish(self.markers)      
       
@@ -34,21 +36,26 @@ class FrontierFinder:
             self.received_map=True
             
       def get_frontier(self):
+            # Convert gridmap message into gray-scale img
             self.map = create_map_raw(np.asarray(self.grid_map.data), self.grid_map.info.height, self.grid_map.info.width)
+
+            # Get frontiers from image
             points = getfrontier(copy(self.map), 
-                                 Xstart   =self.grid_map.info.origin.position.x,
-                                 Ystart   =self.grid_map.info.origin.position.y,
-                                 resolution=self.grid_map.info.resolution)
+                                 Xstart    = self.grid_map.info.origin.position.x,
+                                 Ystart    = self.grid_map.info.origin.position.y,
+                                 resolution= self.grid_map.info.resolution)
             
             self.markers = init_marker()
             self.frontiers.frontiers = []
 
             for point in points:
+                  # For visualisation purposes
                   p = Point()
                   p.x = point[0]
                   p.y = point[1]
                   self.markers.points.append(p)
 
+                  # To be assigned to robots
                   f = Frontier()
                   f.pose.x = point[0]
                   f.pose.y = point[1]
@@ -62,7 +69,6 @@ if __name__ == "__main__":
       core = FrontierFinder()
 
       while not rospy.is_shutdown():
-
             start = time()
             core.spin()
             print("Main loop:", time()-start, " s")

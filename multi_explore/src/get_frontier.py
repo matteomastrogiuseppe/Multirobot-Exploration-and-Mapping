@@ -12,6 +12,8 @@ def getfrontier(img, Xstart ,Ystart,resolution):
 	
 	# Reference frames (ROS and cv2) have opposite y-direction. "0" is the vertical direction
 	img = cv2.flip(img,0)
+
+	# Get obstacles (value 0 in the gray-scale img)
 	obstacles =cv2.inRange(img,0,1)
 	edges = cv2.Canny(img,0,255)
 	large_obst, _ = cv2.findContours(obstacles,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)

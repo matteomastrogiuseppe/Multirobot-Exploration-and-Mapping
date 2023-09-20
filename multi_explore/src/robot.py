@@ -11,10 +11,11 @@ from nav_msgs.msg import Path
 from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Twist
-from read_msgs.msg import Traj
+from multi_explore.msg import Traj
 
 from path_planner import *
 from utils import *
+from time import time
 
 
 class Robot:
@@ -31,6 +32,7 @@ class Robot:
         self.goal           = np.array([])
         self.prev_goal      = np.array([0, 0])
         self.path           = np.array([])
+        self.stop_before = 5
 
         self.change_goal = False
         self.shutdown = False
@@ -104,7 +106,9 @@ class Robot:
             trajectory.append([y, x])
             self.path_pub.poses.append(posuccia)
             #grid_img[point] = 1
-
+        #if len(trajectory) < self.stop_before: pass
+        #else: 
+        #    trajectory = trajectory[:-self.stop_before]
         self.path = np.ravel(trajectory).astype(np.float32)
         #cv2.imwrite("with_path.png", grid_img*255)
         return False        

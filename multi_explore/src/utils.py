@@ -26,7 +26,7 @@ def init_marker(rgb=[0,1,0], scale = 0.2):
 
       return marker
 
-@nb.njit(cache=True, parallel=True)
+@nb.njit(cache=True)
 def create_map_raw(data,h,w):
 	img = np.zeros((h, w, 1), np.uint8)
 	for i in range(h):

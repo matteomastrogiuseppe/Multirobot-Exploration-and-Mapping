@@ -62,7 +62,7 @@
       <!-- RTAB-Map's parameters -->
       <param name="Reg/Strategy"                 type="string" value="1"/>
       <param name="Reg/Force3DoF"                type="string" value="true"/>
-      <param name="Rtabmap/DetectionRate"        type="string" value="4"/>
+      <param name="Rtabmap/DetectionRate"        type="string" value="2"/>
       <param name="Grid/RayTracing"              type="string" value="true"/>
       <param name="Grid/CellSize"                type="string" value="0.05"/>
       <param name="Grid/3D"                      type="string" value="false"/>
@@ -71,7 +71,7 @@
       <param name="Kp/MaxFeatures"               type="string" value="-1"/>    
       <param name="RGBD/ProximityBySpace"        type="string" value="false"/>    
       <param name="RGBD/NeighborLinkRefining"    type="string" value="false"/>    
-      <param name="Mem/BinDataKept"              type="string" value="true"/>    
+      <param name="Mem/BinDataKept"              type="string" value="false"/>    
       
 
       <!-- localization mode -->
@@ -119,7 +119,7 @@
       <!-- RTAB-Map's parameters -->
       <param name="Reg/Strategy"                 type="string" value="1"/>
       <param name="Reg/Force3DoF"                type="string" value="true"/>
-      <param name="Rtabmap/DetectionRate"        type="string" value="4"/>
+      <param name="Rtabmap/DetectionRate"        type="string" value="2"/>
       <param name="Grid/RayTracing"              type="string" value="true"/>
       <param name="Grid/CellSize"                type="string" value="0.05"/>
       <param name="Grid/3D"                      type="string" value="false"/>
@@ -127,7 +127,7 @@
       <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>     
       <param name="Kp/MaxFeatures"               type="string" value="-1"/>    
       <param name="RGBD/ProximityBySpace"        type="string" value="false"/>    
-      <param name="Mem/BinDataKept"              type="string" value="true"/>    
+      <param name="Mem/BinDataKept"              type="string" value="false"/>    
       <param name="RGBD/NeighborLinkRefining"    type="string" value="false"/>    
          
 

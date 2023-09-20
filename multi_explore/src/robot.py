@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import rospy 
+import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 import pyfmm
 
@@ -23,7 +25,7 @@ class Robot:
         self.twist          = Twist()
         self.prev_command   = Twist()
         self.pose           = Pose2D()
-        self.path_pub = Path()
+        self.path_pub       = Path()
         self.path_pub.header.frame_id=self.name+"/odom"
 
         self.goal           = np.array([])
@@ -31,6 +33,7 @@ class Robot:
         self.path           = np.array([])
 
         self.change_goal = False
+        self.shutdown = False
         self.x0 = 0
         self.y0 = 0
 
@@ -52,9 +55,9 @@ class Robot:
         self.pose.y = self.odometry.pose.pose.position.y
         self.pose.theta = get_yaw(self.odometry)
 
-    def spin(self, map, map_info):
+    def spin(self, map, map_info, other_poses):
         self.sub
-        self.change_goal = self.get_trajectory(map, map_info)
+        self.change_goal = self.get_trajectory(map, map_info, other_poses)
 
         if not self.change_goal:
             self.pub_traj.publish(self.path)
@@ -63,7 +66,7 @@ class Robot:
         self.prev_goal = np.array([self.goal.pose.x, self.goal.pose.y])
             
 
-    def get_trajectory(self, map, map_info):
+    def get_trajectory(self, map, map_info, other_poses):
         if len(map.shape)==3:
             map= map.squeeze(-1)
             grid_img = (255 - map > 40).astype(int).astype(float)
@@ -71,11 +74,17 @@ class Robot:
         p1 = pose_to_pixel(self.pose, map_info)
         p2 = pose_to_pixel(self.goal.pose, map_info)
 
+        grid_img = self.avoid_other_robots(other_poses, grid_img, map_info)
+
         p1 = stay_in_grid(p1, grid_img)
         p2 = stay_in_grid(p2, grid_img)
 
         # Potential Map and Saturation
         GRIDCOSTMAP = np.clip(pyfmm.march(grid_img == 1, batch_size=10000)[0], a_min=0, a_max=12.5)
+        #plt.clf()
+        #plt.imshow(GRIDCOSTMAP, interpolation='None')
+        #plt.colorbar()
+        #plt.savefig("costmap.png")
         path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)
 
         if path is None:
@@ -99,6 +108,15 @@ class Robot:
         self.path = np.ravel(trajectory).astype(np.float32)
         #cv2.imwrite("with_path.png", grid_img*255)
         return False        
+    
+    def avoid_other_robots(self, poses, grid_img, map_info):
+        """Return the gridmap but with other robots as obstacles."""
+        if type(poses) is not list: poses = [poses]
+        for pose in poses:
+            x,y = pose_to_pixel(pose, map_info)
+            grid_img[x-5:x+5,y-5:y+5] = 1
+
+        return grid_img
         
 
 

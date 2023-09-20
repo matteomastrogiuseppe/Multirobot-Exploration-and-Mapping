@@ -37,8 +37,9 @@ class TaskManager:
             return 0 
         
         self.assigner()
-        for robot in self.robot_list:
-            robot.spin(self.finder.map, self.finder.grid_map.info)
+        for i, robot in enumerate(self.robot_list):
+            other_poses = [robot.pose for j, robot in enumerate(self.robot_list) if j!=i]
+            robot.spin(self.finder.map, self.finder.grid_map.info, other_poses)
 
         
     
@@ -70,39 +71,50 @@ class TaskManager:
             print("Finished exploring frontiers, going back to the original position...")
             finished = True
 
-
         for i, robot in enumerate(self.robot_list):      
-
             # If all frontiers have been explored, go back to original position.
             if finished:
-                msg = Frontier()
-                msg.pose.x = robot.x0
-                msg.pose.y = robot.y0
-                robot.goal = msg
-                
+                self.robot_go_home(robot)
+
                 # Shutdown robot when back to original position.
                 if abs(robot.pose.x - robot.x0) < 0.1 and \
                    abs(robot.pose.y - robot.y0) < 0.1:
-                    
-                    robot.shutdown = True
-                    print("All frontiers have been explored and robot: \""+robot.name+"\" is back to initial position.")
-                    print("Shutting down robot: \""+robot.name+"\".")
-                    rosnode.kill_nodes([robot.name+'_controller'])                  
-                    robot.twist.linear.x = 0
-                    robot.twist.angular.z = 0
-                    robot.pub_vel.publish(robot.twist)
+                    self.robot_shutdown(robot)
 
             else:       
                 # Assign best frontier
-                f_idx = np.argmax(M[i,:])
-                robot.goal = self.finder.frontiers.frontiers[f_idx]
+                try:
+                    f_idx = np.nanargmax(M[i,:])
+                    robot.goal = self.finder.frontiers.frontiers[f_idx]
+                    # Make sure no other robot is assigned to that frontier
+                    M[:,f_idx] = np.nan
 
-                # Make sure no other robot is assigned to that frontier
-                M[:,f_idx] = - np.inf
-
+                # All frontiers are assigned
+                except:
+                    self.robot_go_home(robot)
+                
             if robot.change_goal:
                 pass
+        
+        if all(robot.shutdown is True for robot in self.robot_list):
+            rospy.signal_shutdown("All robots are off.")
             
+    def robot_shutdown(self,robot):
+        robot.shutdown = True
+        print("All frontiers have been explored and robot: \""+robot.name+"\" is back to initial position.")
+        print("Shutting down robot: \""+robot.name+"\".")
+        rosnode.kill_nodes([robot.name+'_controller'])                  
+        robot.twist.linear.x = 0
+        robot.twist.angular.z = 0
+        robot.pub_vel.publish(robot.twist)
+
+    def robot_go_home(self,robot):
+        msg = Frontier()
+        msg.pose.x = robot.x0
+        msg.pose.y = robot.y0
+        robot.goal = msg
+                
+
 
 if __name__ == "__main__":
     rospy.init_node('assigner', anonymous=True, disable_signals=True)

@@ -1,5 +1,4 @@
 import rospy
-import cv2
 import numba as nb
 import numpy as np
 
@@ -39,9 +38,6 @@ def create_map_raw(data,h,w):
 			elif data[i*w+j]==-1:
 				img[i,j]=205
 	return img
-
-
-#def create_obstacle_map(data,h,w):
 	
 def get_yaw(msg):
       _, _, yaw = euler_from_quaternion([msg.pose.pose.orientation.x,
@@ -51,8 +47,6 @@ def get_yaw(msg):
       return yaw
 
 def pose_to_pixel(pose: Pose2D(), map_info):
-	width = map_info.width
-	height = map_info.height
 	x_origin = map_info.origin.position.x
 	y_origin = map_info.origin.position.y
 	res = map_info.resolution
@@ -67,7 +61,6 @@ def pixel_to_pose(p, map_info):
 
 	xr=p[0]*res+x_origin
 	yr=p[1]*res+y_origin		
-
 	return np.array([xr, yr])
 
 def rot_trasl_2D(p, theta, t):
@@ -103,7 +96,9 @@ def stay_in_grid(p, grid):
 		dist = np.zeros(len(clean))
 		for i, pc in enumerate(clean):
 			dist[i] = abs(p[0]-pc[0])+abs(p[1]-pc[1])
+
 		return (clean[np.argmin(dist)]).astype(np.int64)
+	
 	else: return p
 
 	

@@ -8,15 +8,23 @@ _TBD_
 
 - _ROS Version_ Required: Noetic on Ubuntu 20.04
 
-Follow the ufficial procedure at [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)
+Installation procedure:
 
+```bash
+sudo apt update
+sudo sudo apt install ros-noetic-desktop
+```
+
+Source the environment:
+
+```bash
+echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
 - Make sure that _Gazebo_ and _Rviz_ are installed:
 
 ```bash
 sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control
-```
-
-```bash
 sudo apt-get install ros-noetic-rviz
 ```
 

@@ -9,6 +9,9 @@ from frontier_finder        import FrontierFinder
 from robot                  import Robot
 from utils                  import *
 
+import os
+import pickle
+
 
 class TaskManager:
 
@@ -28,9 +31,14 @@ class TaskManager:
         print("--- Created Robots ---")
 
         # Assigner gains 
-        self.k_i        = 0.9
+        self.k_i        = 0
         self.k_c        = - 4
-        self.k_change   = - 1
+        self.k_change   = 0
+
+        # Store Data
+        self.collect_data = True
+        self.t_list = []
+        self.clean_list = []
 
     def spin(self):        
         # Find new frontiers
@@ -42,6 +50,9 @@ class TaskManager:
         
         # Assign frontiers to robots
         self.assigner()
+        
+        self.t_list.append(rospy.get_rostime().to_sec() - self.finder.start_time)
+        self.clean_list.append(self.finder.clean_area)
 
         # Compute trajectories for each robot
         for i, robot in enumerate(self.robot_list):
@@ -71,8 +82,8 @@ class TaskManager:
                 # Final reward function
                 M[i,j] = info_gain + expl_cost + change_cost
 
-                #if ((robot.pose.x-fx)**2 + (robot.pose.y-fy)**2)**0.5 < 0.3: 
-                #    M[i,j] = np.nan
+                if ((robot.pose.x-fx)**2 + (robot.pose.y-fy)**2) < 0.25: 
+                    M[i,j] = -np.nan
         return M
     
     def assigner(self):
@@ -84,37 +95,46 @@ class TaskManager:
             print("Finished exploring frontiers, going back to the original position...")
             finished = True
 
+            if self.collect_data:
+                self.save_data()
+                rospy.signal_shutdown("Need time to collect data.")
+        
         # Assign frontier to each robot
-        for i, robot in enumerate(self.robot_list):  
+        assigned = np.full(len(self.robot_list), False)
+
+        for i in range(len(self.robot_list)):
 
             # If all frontiers have been explored, go back to original position.
             if finished:
-                self.robot_go_home(robot)
+                self.robot_go_home(self.robot_list[i])
                 # Shutdown robot when back to original position.
-                if abs(robot.pose.x - robot.x0) < 0.1 and \
-                   abs(robot.pose.y - robot.y0) < 0.1:
-                    self.robot_shutdown(robot)
+                if abs(self.robot_list[i].pose.x - self.robot_list[i].x0) < 0.1 and \
+                   abs(self.robot_list[i].pose.y - self.robot_list[i].y0) < 0.1:
+                    self.robot_shutdown(self.robot_list[i])
 
-            else: # Assign best frontier
+            # Otherwise, assign best frontier
+            try:
+                r,f = np.unravel_index(np.nanargmax(M, axis=None), M.shape)
+                M[r,:] = np.nan; M[:,f] = np.nan
+                assigned[r] = True
 
-                try:
-                    f_idx = np.nanargmax(M[i,:])
-                    robot.goal = self.finder.frontiers.frontiers[f_idx]
+                self.robot_list[r].goal = self.finder.frontiers.frontiers[f]
 
-                    # Make sure no other robots are assigned to that frontier or close ones:
-                    for i, front in enumerate(self.finder.frontiers.frontiers):
+                # Make sure no other robots are assigned to that frontier or close ones:
+                for k, front in enumerate(self.finder.frontiers.frontiers):
                         x,y = front.pose.x, front.pose.y
-                        if ((x-robot.goal.pose.x)**2 + (y-robot.goal.pose.y))**0.5 < 2:
-                            M[:,i] = np.nan
+                        if ((x-self.robot_list[r].goal.pose.x)**2 + (y-self.robot_list[r].goal.pose.y)**2) < 2:
+                            M[:,k] = np.nan
 
-                except: # All frontiers are already assigned
-                    self.robot_go_home(robot)
-                
-            if robot.change_goal: #To be implemented
-                pass
-        
+            except: # All frontiers are already assigned
+                for j in range(len(self.robot_list)):
+                    if not assigned[j]:
+                        print("Robot ", self.robot_list[j].name, " idle, going home.")
+                        self.robot_go_home(self.robot_list[j])
+
         # Shutdown assigner node if all robots are turned off
         if all(robot.shutdown is True for robot in self.robot_list):
+            self.save_data()
             rospy.signal_shutdown("All robots are off.")
             
     def robot_shutdown(self,robot):
@@ -132,6 +152,31 @@ class TaskManager:
         msg.pose.y = robot.y0
         robot.goal = msg
                 
+    def save_data(self):
+        path = os.path.dirname(os.path.abspath(__file__))+'/sim_data_'
+
+        if len(self.robot_list) > 1:
+            path = path+'multi/'
+        else:
+            path = path+'single/'
+
+        if self.k_i == 0:
+            path = path+'old_policy/'
+        else:
+            path = path+'new_policy/'
+
+        for i in range(1,6):
+            folder = path+'sim_'+str(i)
+            if os.path.exists(folder):
+                continue
+            else: 
+                os.makedirs(folder)
+                with open(folder+'/t.pickle', 'wb') as fp:
+                    pickle.dump(self.t_list, fp)
+                with open(folder+'/map.pickle', 'wb') as fp:
+                    pickle.dump(self.clean_list, fp)
+                break
+
 
 if __name__ == "__main__":
     rospy.init_node('assigner', anonymous=True, disable_signals=True)

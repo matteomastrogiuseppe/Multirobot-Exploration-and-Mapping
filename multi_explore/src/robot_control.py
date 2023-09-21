@@ -32,7 +32,7 @@ class RobotController:
         self.max_vel        = 0.2
         self.max_ang_vel    = 1
         self.safe_dist      = 1.1
-        self.look_ahead     = 0.7
+        self.look_ahead     = 1
         self.sample_time    = 0.1
 
         # PID Controller gains and variables 
@@ -85,11 +85,11 @@ class RobotController:
 
         # Follow the path carefully if the goal is close
         if dist < self.safe_dist:
-            look_ahead = self.look_ahead/4
+            look_ahead = self.look_ahead/3
         elif dist < self.safe_dist/2:
-            look_ahead = self.look_ahead/8
+            look_ahead = self.look_ahead/6
         else: 
-            look_ahead = 0.7
+            look_ahead = self.look_ahead/2
 
         d_arc = 0
         step = 0

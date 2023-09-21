@@ -25,7 +25,6 @@
   <arg name="second_tb3_yaw"   default=" 1.57"/>
   
 
-  <arg name="with_camera" default="true"/>
   <arg name="localization" default="false"/>
   <arg name="database_path" default="~/.ros/rtabmap"/>
   <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
@@ -157,23 +156,23 @@
   <!-- Run the multirobot_map_merging node -->
 
   <node pkg="multirobot_map_merge" type="map_merge" respawn="false" name="map_merge">
-    <param name="robot_map_topic" value="map"/> 
+    <param name="robot_map_topic" value="/map"/> 
     <param name="robot_namespace" value="tb3"/>
     <param name="merged_map_topic" value="total_map"/>
     <param name="world_frame" value="map"/>
     <param name="known_init_poses" value="true"/>
     <param name="merging_rate" value="2"/>
     <param name="discovery_rate" value="0.05"/>
-    <param name="estimation_rate" value="0.1"/>
-    <param name="estimation_confidence" value="1.0"/>
+    <param name="estimation_rate" value="10"/>
+    <param name="estimation_confidence" value="2.0"/>
   </node>
   
   <node pkg="multi_explore" type="assigner.py" name="assigner" output="screen">
     <param name="robot_namelist" value="$(arg first_tb3),$(arg second_tb3)"/>
     <param name="tb3_0_x" value="$(arg first_tb3_x_pos)"/>
-    <param name="tb3_0_y" value="$(arg first_tb3_x_pos)"/>
+    <param name="tb3_0_y" value="$(arg first_tb3_y_pos)"/>
     <param name="tb3_1_x" value="$(arg second_tb3_x_pos)"/>
-    <param name="tb3_1_y" value="$(arg second_tb3_x_pos)"/>
+    <param name="tb3_1_y" value="$(arg second_tb3_y_pos)"/>
     <param name="assign_rate" value="$(arg assign_rate)"/>
   </node>
 

@@ -12,6 +12,7 @@ from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Twist
 from multi_explore.msg import Traj
+from multi_explore.msg import Frontier
 
 from path_planner import *
 from utils import *
@@ -29,7 +30,9 @@ class Robot:
         self.path_pub       = Path()
         self.path_pub.header.frame_id=self.name+"/odom"
 
-        self.goal           = np.array([])
+        self.goal           = Frontier()
+        self.goal.pose.x    = 0
+        self.goal.pose.y    = 0
         self.prev_goal      = np.array([0, 0])
         self.path           = np.array([])
 
@@ -44,8 +47,7 @@ class Robot:
         self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Path, queue_size=10)
 
         # Obstacle avoidance gain
-        self.k_obstacles = 2
-
+        self.k_obstacles = 1
 
     def callback_odom(self,msg):
         self.odometry = msg

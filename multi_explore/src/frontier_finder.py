@@ -20,13 +20,16 @@ class FrontierFinder:
             self.grid_map     = OccupancyGrid()
             self.map          = np.array([])
 
+            self.clean_area   = 0 # Grid cells marked as "clean area"
+            self.start_time   = 0
+
             self.received_map = False
 
       def spin(self):
            self.sub
            # Wait for publishing of map
            while not self.received_map:
-                pass
+                self.start_time = rospy.get_rostime().to_sec()
            
            self.get_frontier() 
            self.pub_rviz.publish(self.markers)      
@@ -37,7 +40,7 @@ class FrontierFinder:
             
       def get_frontier(self):
             # Convert gridmap message into gray-scale img
-            self.map = create_map_raw(np.asarray(self.grid_map.data), self.grid_map.info.height, self.grid_map.info.width)
+            self.map, self.clean_area = create_map_raw(np.asarray(self.grid_map.data), self.grid_map.info.height, self.grid_map.info.width)
 
             # Get frontiers from image
             points = getfrontier(copy(self.map), 

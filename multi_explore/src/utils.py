@@ -30,15 +30,17 @@ def init_marker(rgb=[0,1,0], scale = 0.2):
 def create_map_raw(data,h,w):
 	"""Create gray-scale image from Occupancy-Grid data."""
 	img = np.zeros((h, w, 1), np.uint8)
+	clean_area = 0
 	for i in range(h):
 		for j in range(w):
 			if data[i*w+j]==100:
 				img[i,j]=0
 			elif data[i*w+j]==0:
 				img[i,j]=255
+				clean_area += 1
 			elif data[i*w+j]==-1:
 				img[i,j]=205
-	return img
+	return img, clean_area
 	
 def get_yaw(msg):
 	"""Get yaw from odometry msg."""

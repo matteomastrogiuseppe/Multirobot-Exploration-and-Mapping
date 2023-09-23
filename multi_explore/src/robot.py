@@ -4,6 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pyfmm
+import skfmm
 
 from rospy.numpy_msg import numpy_msg
 from nav_msgs.msg import Odometry
@@ -86,12 +87,13 @@ class Robot:
         p1 = stay_in_grid(p1, grid_img)
         p2 = stay_in_grid(p2, grid_img)
 
-        # Potential Map and Saturation
-        GRIDCOSTMAP = np.clip(pyfmm.march(grid_img == 1, batch_size=10000)[0], a_min=0, a_max=12.5)
-        plt.clf()
-        plt.imshow(GRIDCOSTMAP[130:290, 130:290], interpolation='None')
-        plt.title("Fast Marching Method Costmap")
-        plt.savefig("img/costmap.png")
+        # Get costmap with Fast Marching Method. Library needs gridmap with zeros as obstacles
+        GRIDCOSTMAP = np.clip(skfmm.distance(1-grid_img), a_min=0, a_max=12.5)
+        #plt.clf()
+        #plt.imshow(GRIDCOSTMAP[130:290, 130:290], interpolation='None')
+        #plt.title("Fast Marching Method Costmap")
+        #plt.axis('off')
+        #plt.savefig("img/costmap.png")
 
         # A* path planning, as list of points, in image pixels
         path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)

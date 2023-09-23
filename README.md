@@ -8,7 +8,7 @@ The work aims at achieving autonomous exploration and mapping in an unknown envi
 General scheme of the simulation:
 
 <p align="center" display="inblock">
-<img src="./images/simulation.png" alt="Simulation Environment" width="80%"> 
+<img src="./images/simulation.png" alt="Simulation Environment" width="60%"> 
 </p>
 
 
@@ -16,7 +16,7 @@ The solution of the SLAM problem and point-cloud re-construnction is handled by 
 
 A OpenCV-based frontier detector identifies the regions to be explored in the map. 
 <p align="center" display="inblock">
-<img src="./images/frontiers.png" alt="Frontiers" width="80%"> 
+<img src="./images/frontiers.png" alt="Frontiers" width="60%"> 
 </p>
 
 A task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and it ensures obstacle avoidance with good clearance. 

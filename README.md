@@ -3,17 +3,15 @@
 ## Project Overview:
 Final project of the course "Design Methods for Unmanned Vehicles" of University of Trento.
 
-The work aims at achieving an autonomous exploration and mapping in an unknown environment, by deploying multiple robots. The project has been developed as a ROS (Noetic) package, developed in Python3.
+The work aims at achieving autonomous exploration and mapping in an unknown environment, by deploying multiple robots. The project has been developed as a ROS (Noetic) package, developed in Python3.
 
-The solution of the SLAM problem and point-cloud re-construnction is handled by RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global map of the environment. A OpenCV-based frontier detector identifies the regions to be explored in the map, and a task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and ensures obstacle avoidance with good clearance. 
+The solution of the SLAM problem and point-cloud re-construnction is handled by RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global map of the environment. A OpenCV-based frontier detector identifies the regions to be explored in the map, and a task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and it ensures obstacle avoidance with good clearance. 
 
-The information connected to the point cloud will be stored into a database `.db` file. In order to obtain the final Point Cloud run the following module in a bash terminal 
+General scheme of the simulation
 
-```bash
-rtabmap-databaseViewer
-```
-
-_TBD_
+<p align="center" display="inblock">
+<img src="./images/MDS_visualization.png" alt="MDS visualization" width="40%"> <img src="./images/trilateration.png" alt="Trilateration visualization" width="40%">
+</p>
 
 ## Installation Steps:
 
@@ -101,13 +99,20 @@ sudo apt install python3-pip
 ```
 Install the required libraries:
 ```bash
-pip3 install numpy cv2 numba pyfmm
+pip3 install numpy opencv-python numba pyfmm
 ```
 
-## Try the installation
+## Run the project
 
-To try the correct installation, run:
+To run the simulation:
 
 ```bash
-roslaunch multi_explore multi.launch
+roslaunch multi_explore multi_explore.launch
 ```
+q
+Final point-cloud is stored into a `.db` database file. n order to obtain the final Point Cloud run the following module in a bash terminal 
+
+```bash
+rtabmap-databaseViewer
+```
+Import the .db file, and export the final point-cloud as a .ply file.

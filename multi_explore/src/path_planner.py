@@ -43,7 +43,7 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
             # New position in grid
             x, y = cur_x + dx, cur_y + dy
             # Travelling cost different for horiz/vert transitions and diagonal ones
-            if abs(x)+abs(y)==2: L=np.sqrt(2)
+            if abs(dx)+abs(dy)==2: L=np.sqrt(2)
             else: L=1
             # Don't consider if out of bounds
             if x < 0 or x >= x_max or y < 0 or y >= y_max: continue    
@@ -59,10 +59,9 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
                     value[x,y] = value[cur_x,cur_y] + L 
 
                     # Definition of the heuristic: first consider points which get closer to the end goal and stay far from obstacles
-                    cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )**2           # activate to get A*
-                    dist_cost = np.exp(distcost(dist_cost_map, max_dist_cost,x,y, k=k)) # activate to get smoothed A* 
-                    heuristic = value[x,y]  + cart_distance + dist_cost
-                    
+                    cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )        # activate to get A*
+                    dist_cost = distcost(dist_cost_map, max_dist_cost,x,y, k=k)   # activate to get smoothed A* 
+                    heuristic = value[x,y]  + cart_distance + np.exp(dist_cost)
                     # Insert this new point in the priority queue
                     heapq.heappush(priority_queue, (heuristic, (x, y)))
                     # Store the transition to retrieve the path 
@@ -84,7 +83,7 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
         step+=1
 
         # To avoid getting stuck in the loop for any reason
-        if step > 500:
+        if step > 1000:
             return None
 
     return path

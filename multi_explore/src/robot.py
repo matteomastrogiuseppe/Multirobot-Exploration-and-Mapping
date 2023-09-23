@@ -48,7 +48,7 @@ class Robot:
         self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Path, queue_size=10)
 
         # Obstacle avoidance gain
-        self.k_obstacles = 1
+        self.k_obstacles = 2
 
     def callback_odom(self,msg):
         self.odometry = msg
@@ -88,12 +88,13 @@ class Robot:
         p2 = stay_in_grid(p2, grid_img)
 
         # Get costmap with Fast Marching Method. Library needs gridmap with zeros as obstacles
-        GRIDCOSTMAP = np.clip(skfmm.distance(1-grid_img), a_min=0, a_max=12.5)
+        GRIDCOSTMAP = np.clip(skfmm.distance(1-grid_img), a_min=0, a_max=20)
         #plt.clf()
-        #plt.imshow(GRIDCOSTMAP[130:290, 130:290], interpolation='None')
+        #plt.imshow(GRIDCOSTMAP[130:290, 130:290])
         #plt.title("Fast Marching Method Costmap")
+        #plt.colorbar()
         #plt.axis('off')
-        #plt.savefig("img/costmap.png")
+        #plt.savefig("/imgcostmap.png")
 
         # A* path planning, as list of points, in image pixels
         path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)

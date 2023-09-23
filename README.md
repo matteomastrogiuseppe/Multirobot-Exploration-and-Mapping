@@ -1,7 +1,11 @@
 # Multirobot Exploration and Mapping
 
 ## Project Overview:
-To obtain an accurate Point Cloud map of the environment visited the solution by [IntRoLab](https://github.com/introlab) was used. In particular the solution offered by [rtabmap_ros](https://github.com/introlab/rtabmap_ros) allows a seamless integration of the library directly in `ROS`.
+Final project of the course "Design Methods for Unmanned Vehicles" of University of Trento.
+
+The work aims at achieving an autonomous exploration and mapping in an unknown environment, by deploying multiple robots. The project has been developed as a ROS (Noetic) package, developed in Python3.
+
+The solution of the SLAM problem and point-cloud re-construnction is handled by RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global map of the environment. A OpenCV-based frontier detector identifies the regions to be explored in the map, and a task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and ensures obstacle avoidance with good clearance. 
 
 The information connected to the point cloud will be stored into a database `.db` file. In order to obtain the final Point Cloud run the following module in a bash terminal 
 

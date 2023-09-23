@@ -80,7 +80,7 @@
 
     <!-- visualization with rtabmap_viz -->
     <node if="$(arg rtabmap_viz)" pkg="rtabmap_viz" type="rtabmap_viz" name="rtabmap_viz" args="-d $(find rtabmap_demos)/launch/config/rgbd_gui.ini" output="screen">
-      <param name="subscribe_scan"   type="bool"   value="true"/>
+      <param name="subscribe_scan"   type="bool"   value="false"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="/tb3_0/base_footprint"/>
       <param name="approx_sync"      type="bool"   value="true"/>
@@ -136,7 +136,7 @@
     </node>
 
     <node if="$(arg rtabmap_viz)" pkg="rtabmap_viz" type="rtabmap_viz" name="rtabmap_viz" args="-d $(find rtabmap_demos)/launch/config/rgbd_gui.ini" output="screen">
-      <param name="subscribe_scan"   type="bool"   value="true"/>
+      <param name="subscribe_scan"   type="bool"   value="false"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="/tb3_1/base_footprint"/>
       <param name="approx_sync"      type="bool"   value="false"/>

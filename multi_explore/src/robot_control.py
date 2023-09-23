@@ -66,7 +66,7 @@ class RobotController:
     
     def pure_pursuit(self):
         # Trajectory data was raveled before publishing. Go back to [x,y] pairs,
-        # but in robot reference frame!
+        # but in robot reference frame! (from global /map)
         paired = self.traj.reshape((int(self.traj.shape[0]/2), 2))
         traj = []
         for p in paired[::-1]:

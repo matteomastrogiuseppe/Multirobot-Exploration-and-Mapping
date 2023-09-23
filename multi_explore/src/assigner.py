@@ -74,7 +74,7 @@ class TaskManager:
                 info_gain = self.k_i*frontier.length
 
                 # Distance robot-frontier
-                expl_cost = self.k_c*(np.sqrt((rx-fx)**2+(ry-fy)**2)) 
+                expl_cost = self.k_c*(np.sqrt((rx-fx)**2+(ry-fy)**2))**0.5 
 
                 # Promote using the old frontier
                 change_cost = self.k_change* ((robot.prev_goal[0]-fx)**2 + (robot.prev_goal[1]-fy)**2)
@@ -82,7 +82,7 @@ class TaskManager:
                 # Final reward function
                 M[i,j] = info_gain + expl_cost + change_cost
 
-                # Avoid
+                # If robot is too close it likely cannot scan that area (use of RGB-D)
                 if ((robot.pose.x-fx)**2 + (robot.pose.y-fy)**2) < 0.25: 
                     M[i,j] = -np.nan
         return M
@@ -96,6 +96,7 @@ class TaskManager:
             print("Finished exploring frontiers, going back to the original position...")
             finished = True
 
+            # Early stopping in data collection
             if self.collect_data:
                 self.save_data()
                 rospy.signal_shutdown("Need time to collect data.")
@@ -116,16 +117,16 @@ class TaskManager:
             # Otherwise, assign best frontier
             try:
                 r,f = np.unravel_index(np.nanargmax(M, axis=None), M.shape)
-                M[r,:] = np.nan; M[:,f] = np.nan
+                M[r,:] = np.nan; M[:,f] = np.nan # No other robots assigned to that frontier
                 assigned[r] = True
 
                 self.robot_list[r].goal = self.finder.frontiers.frontiers[f]
 
                 # Make sure no other robots are assigned to that frontier or close ones:
                 for k, front in enumerate(self.finder.frontiers.frontiers):
-                        x,y = front.pose.x, front.pose.y
-                        if ((x-self.robot_list[r].goal.pose.x)**2 + (y-self.robot_list[r].goal.pose.y)**2) < 2:
-                            M[:,k] = np.nan
+                    x,y = front.pose.x, front.pose.y
+                    if ((x-self.robot_list[r].goal.pose.x)**2 + (y-self.robot_list[r].goal.pose.y)**2) < 2:
+                        M[:,k] = np.nan
 
             except: # All frontiers are already assigned
                 for j in range(len(self.robot_list)):

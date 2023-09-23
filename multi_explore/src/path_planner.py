@@ -52,13 +52,17 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
 
             # Don't consider if already visited
             if ~visited[x,y]:
+
                 # Only consider this point if it decreases the value function from the original point
                 if value[cur_x, cur_y] + L < value[x,y]:       
+                    
                     value[x,y] = value[cur_x,cur_y] + L 
+
                     # Definition of the heuristic: first consider points which get closer to the end goal and stay far from obstacles
                     cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )**2           # activate to get A*
                     dist_cost = np.exp(distcost(dist_cost_map, max_dist_cost,x,y, k=k)) # activate to get smoothed A* 
                     heuristic = value[x,y]  + cart_distance + dist_cost
+                    
                     # Insert this new point in the priority queue
                     heapq.heappush(priority_queue, (heuristic, (x, y)))
                     # Store the transition to retrieve the path 

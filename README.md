@@ -10,7 +10,7 @@ The solution of the SLAM problem and point-cloud re-construnction is handled by 
 General scheme of the simulation
 
 <p align="center" display="inblock">
-<img src="./images/MDS_visualization.png" alt="MDS visualization" width="40%"> <img src="./images/trilateration.png" alt="Trilateration visualization" width="40%">
+<img src="./images/simulation.png" alt="Simulation Environment" width="80%"> 
 </p>
 
 ## Installation Steps:
@@ -109,7 +109,7 @@ To run the simulation:
 ```bash
 roslaunch multi_explore multi_explore.launch
 ```
-q
+
 Final point-cloud is stored into a `.db` database file. n order to obtain the final Point Cloud run the following module in a bash terminal 
 
 ```bash

@@ -110,7 +110,7 @@ sudo apt install python3-pip
 ```
 Install the required libraries:
 ```bash
-pip3 install numpy opencv-python numba pyfmm
+pip3 install numpy opencv-python numba scikit-fmm
 ```
 
 ## Run the project

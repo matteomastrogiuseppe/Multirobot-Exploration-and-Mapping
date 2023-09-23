@@ -67,10 +67,10 @@ def pixel_to_pose(p, map_info):
 
 	xr=p[0]*res+x_origin
 	yr=p[1]*res+y_origin		
-	return np.array([xr, yr])
+	return np.array([yr, xr])
 
 def rot_trasl_2D(p, theta, t):
-	"""First rotation, then translation. (local-->global frame)"""
+	"""First rotation, then translation. (local --> global frame)"""
 	R = np.array([
 		[np.cos(theta), -np.sin(theta), t[0]],
 		[np.sin(theta),  np.cos(theta), t[1]],

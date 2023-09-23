@@ -20,7 +20,7 @@ class TaskManager:
         self.finder = FrontierFinder()
         print("--- Initialized Finder ---")
 
-        # Create list of Robot istances
+        # Create list of Robot instances
         robot_namelist = rospy.get_param('~robot_namelist', "robot1").split(',')
         self.robot_list = []
         for i in range(len(robot_namelist)):
@@ -33,7 +33,7 @@ class TaskManager:
         # Assigner gains 
         self.k_i        = 0.9
         self.k_c        = - 4
-        self.k_change   = - 1
+        self.k_change   = 0
 
         # Store Data
         self.collect_data = True

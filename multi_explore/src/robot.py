@@ -88,10 +88,10 @@ class Robot:
 
         # Potential Map and Saturation
         GRIDCOSTMAP = np.clip(pyfmm.march(grid_img == 1, batch_size=10000)[0], a_min=0, a_max=12.5)
-        #plt.clf()
-        #plt.imshow(GRIDCOSTMAP, interpolation='None')
-        #plt.colorbar()
-        #plt.savefig("costmap.png")
+        plt.clf()
+        plt.imshow(GRIDCOSTMAP[130:290, 130:290], interpolation='None')
+        plt.title("Fast Marching Method Costmap")
+        plt.savefig("img/costmap.png")
 
         # A* path planning, as list of points, in image pixels
         path = A_STAR(grid_img, GRIDCOSTMAP, p1, p2, k=self.k_obstacles)
@@ -106,22 +106,17 @@ class Robot:
 
             posuccia = PoseStamped()            
             posuccia.pose.orientation.w = 1
-            posuccia.pose.position.x = y
-            posuccia.pose.position.y = x
+            posuccia.pose.position.x = x
+            posuccia.pose.position.y = y
             posuccia.pose.position.z = 0
 
             # Trajectory in /map coordinates
-            trajectory.append([y, x])
+            trajectory.append([x, y])
             # For RViz visualisation
             self.path_pub.poses.append(posuccia)
-            
-        #if len(trajectory) < self.stop_before: pass
-        #else: 
-        #    trajectory = trajectory[:-self.stop_before]
 
         # Ravel the trajectory to easily send it as ROS message
         self.path = np.ravel(trajectory).astype(np.float32)
-        #cv2.imwrite("with_path.png", grid_img*255)
         return False        
     
     def avoid_other_robots(self, poses, grid_img, map_info):

@@ -29,7 +29,7 @@ class RobotController:
         self.pub_vel  = rospy.Publisher(self.name+'/cmd_vel', Twist, queue_size=10)
         
         # Robot coefficients
-        self.max_vel        = 0.2
+        self.max_vel        = 0.25
         self.max_ang_vel    = 1
         self.safe_dist      = 1.1
         self.look_ahead     = 1

@@ -31,9 +31,9 @@ class TaskManager:
         print("--- Created Robots ---")
 
         # Assigner gains 
-        self.k_i        = 0
+        self.k_i        = 0.9
         self.k_c        = - 4
-        self.k_change   = 0
+        self.k_change   = - 1
 
         # Store Data
         self.collect_data = True
@@ -82,6 +82,7 @@ class TaskManager:
                 # Final reward function
                 M[i,j] = info_gain + expl_cost + change_cost
 
+                # Avoid
                 if ((robot.pose.x-fx)**2 + (robot.pose.y-fy)**2) < 0.25: 
                     M[i,j] = -np.nan
         return M

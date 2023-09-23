@@ -16,12 +16,12 @@ The solution of the SLAM problem and point-cloud re-construnction is handled by 
 
 A OpenCV-based frontier detector identifies the regions to be explored in the map. 
 <p align="center" display="inblock">
-<img src="./images/frontiers.png" alt="Frontiers" width="60%"> 
+<img src="./images/frontiers.png" alt="Frontiers" width="50%"> 
 </p>
 
 A task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and it ensures obstacle avoidance with good clearance. 
 <p align="center" display="inblock">
-<img src="./images/explore.png" alt="Frontiers" width="60%"> 
+<img src="./images/explore.png" alt="Frontiers" width="50%"> 
 </p>
 
 ## Installation Steps:

@@ -5,12 +5,23 @@ Final project of the course "Design Methods for Unmanned Vehicles" of University
 
 The work aims at achieving autonomous exploration and mapping in an unknown environment, by deploying multiple robots. The project has been developed as a ROS (Noetic) package, developed in Python3.
 
-The solution of the SLAM problem and point-cloud re-construnction is handled by RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global map of the environment. A OpenCV-based frontier detector identifies the regions to be explored in the map, and a task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and it ensures obstacle avoidance with good clearance. 
-
-General scheme of the simulation
+General scheme of the simulation:
 
 <p align="center" display="inblock">
 <img src="./images/simulation.png" alt="Simulation Environment" width="80%"> 
+</p>
+
+
+The solution of the SLAM problem and point-cloud re-construnction is handled by RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global map of the environment. 
+
+A OpenCV-based frontier detector identifies the regions to be explored in the map. 
+<p align="center" display="inblock">
+<img src="./images/frontiers.png" alt="Frontiers" width="80%"> 
+</p>
+
+A task manager assigns the frontiers to the individual robots, following a precise exploration strategy. An improved version of the A* algorithm is used for path planning, and it ensures obstacle avoidance with good clearance. 
+<p align="center" display="inblock">
+<img src="./images/explore.png" alt="Frontiers" width="80%"> 
 </p>
 
 ## Installation Steps:

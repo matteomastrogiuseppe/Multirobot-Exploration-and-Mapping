@@ -48,7 +48,7 @@ class Robot:
         self.rviz_traj = rospy.Publisher('/'+self.name+'/traject', Path, queue_size=10)
 
         # Obstacle avoidance gain
-        self.k_obstacles = 2
+        self.k_obstacles = 20
 
     def callback_odom(self,msg):
         self.odometry = msg

@@ -8,7 +8,7 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
     x_max, y_max = grid.shape
     
     # Initialize value function as inf, except for first point.
-    value = np.full_like(grid, 1.0e10)
+    value = np.full_like(grid, np.inf)
     value[p1[0],p1[1]] = grid[p1[0],p1[1]]
 
     if grid[p1[0],p1[1]] or grid[p2[0],p2[1]]: raise Exception("Start/goal is not in clear area.")

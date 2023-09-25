@@ -35,20 +35,35 @@ Install ROS Noetic:
 sudo apt update
 sudo sudo apt install ros-noetic-desktop
 ```
-
 Source the ROS environment:
-
 ```bash
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 Make sure that _Gazebo_ and _Rviz_ are installed:
-
 ```bash
 sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control
 sudo apt-get install ros-noetic-rviz
 ```
 
+### Install Dependecies:
+For a first development, the `TurtleBot` environment was used. Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian.
+RTAB-Map was used for solution of SLAM and mapping.
+_multirobot_map_merge_ was used to merge the robot individual maps.
+```bash
+cd ~/turtle_ws/src
+git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations
+git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3
+git clone -b noetic-devel https://github.com/introlab/rtabmap_ros
+git clone -b noetic-devel https://github.com/hrnr/m-explore/tree/noetic-devel/map_merge
+```
+
+Make sure to add the Turtlebot model used in this project to the .bashrc file:
+
+```bash
+echo "export TURTLEBOT3_MODEL=waffle" >> ~/.bashrc
+source ~/.bashrc
+```
 
 ### Create ROS Workspace
 Create the **catkin_ws** workspace:
@@ -75,40 +90,13 @@ echo "source ~/turtle_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Install Dependecies Test this out:
-```bash
-
-git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations
-git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3
-git clone -b noetic-devel https://github.com/introlab/rtabmap_ros
-git clone -b noetic-devel https://github.com/hrnr/m-explore/tree/noetic-devel
-```
-
-Make sure to add the Turtlebot model to the .bashrc file:
-
-```bash
-echo "export TURTLEBOT3_MODEL=waffle" >> ~/.bashrc
-source ~/.bashrc
-```
-
-### RTAB-Map and Map Merge:
-For a first development, the `TurtleBot` environment was used.
-Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian:
-Run the following bash code to install RTAB-Map:
-_multirobot_map_merge_ was used to merge the robot individual maps.
-```bash
-sudo apt-get install ros-$ROS_DISTRO-turtlebot3 apt-get install ros-$ROS_DISTRO-turtlebot3-gazebo 
-sudo apt install ros-$ROS_DISTRO-rtabmap-ros
-sudo apt install ros-$ROS_DISTRO-multirobot-map-merge
-```
-
 ### Python 
 Install Python 3.8 with the following command:
 ```bash
 sudo apt install python3.8
 sudo apt install python3-pip
 ```
-Install the required libraries:
+Install the required packages:
 ```bash
 pip3 install numpy opencv-python numba scikit-fmm
 ```
@@ -120,6 +108,8 @@ To run the simulation:
 ```bash
 roslaunch multi_explore multi_explore.launch
 ```
+
+The global map generally spawns after 20 seconds in ROS time, because of the map merger initial overhead. The first run will take more time, because some functions will be compiled in machine code through the _Numba_ library. After the first run, everything is stored in the cache, so no need to wait for the compilation at every launch.
 
 Final point-cloud is stored into a `.db` database file. n order to obtain the final Point Cloud run the following module in a bash terminal 
 

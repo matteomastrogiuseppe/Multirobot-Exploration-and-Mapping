@@ -3,7 +3,7 @@
 ## Project Overview:
 Final project of the course "Design Methods for Unmanned Vehicles" of University of Trento.
 
-The work aims at achieving autonomous exploration and mapping in an unknown environment, by deploying multiple robots equipped only with an RGB-D camera. The project has been developed as a ROS (Noetic) package, developed in Python3. Turtlebot was used as robot model, but the core can be easily deployed on other models.
+The work aims at achieving autonomous exploration and mapping in an unknown environment by deploying multiple robots, each equipped with an RGB-D camera. The project has been developed as a ROS (Noetic) package, developed in Python3. Turtlebot was used as robot model, but the core can be easily deployed on other models.
 
 General scheme of the simulation:
 
@@ -46,23 +46,27 @@ sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control
 sudo apt-get install ros-noetic-rviz
 ```
 
+### Python 
+Install Python 3.8 with the following command:
+```bash
+sudo apt install python3.8
+sudo apt install python3-pip
+```
+Install the required packages:
+```bash
+pip3 install numpy opencv-python numba scikit-fmm
+```
+
 ### Install Dependecies:
 For a first development, the `TurtleBot` environment was used. Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian.
-RTAB-Map was used for solution of SLAM and mapping.
-_multirobot_map_merge_ was used to merge the robot individual maps.
+`RTAB-Map` was used for solution of SLAM and mapping.
+`multirobot_map_merge` was used to merge the robot individual maps.
 ```bash
 cd ~/turtle_ws/src
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3
 git clone -b noetic-devel https://github.com/introlab/rtabmap_ros
 git clone -b noetic-devel https://github.com/hrnr/m-explore/tree/noetic-devel/map_merge
-```
-
-Make sure to add the Turtlebot model used in this project to the .bashrc file:
-
-```bash
-echo "export TURTLEBOT3_MODEL=waffle" >> ~/.bashrc
-source ~/.bashrc
 ```
 
 ### Create ROS Workspace
@@ -88,17 +92,6 @@ Remember to **source** this workspace by editing the .bashrc file:
 ```bash
 echo "source ~/turtle_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
-```
-
-### Python 
-Install Python 3.8 with the following command:
-```bash
-sudo apt install python3.8
-sudo apt install python3-pip
-```
-Install the required packages:
-```bash
-pip3 install numpy opencv-python numba scikit-fmm
 ```
 
 ## Run the project

@@ -4,15 +4,16 @@
   <include file="$(find multi_explore)/launch/include/multi_tb.launch">
   </include>
 
-
   <!-- Arguments -->
   <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
   <arg name="open_rviz" default="true"/> 
   <arg name="rtabmap_viz" default="false"/> 
   <arg name="assign_rate" default="2"/>
+  <arg name="save_point_cloud" default="false"/> <!-- Disable this to go faster -->
 
   <arg name="first_tb3"  default="tb3_0"/>
   <arg name="second_tb3" default="tb3_1"/>
+  <arg name="robot_name_list" default=" $(arg first_tb3),$(arg second_tb3)"/>
 
   <arg name="first_tb3_x_pos" default="-0.3"/>
   <arg name="first_tb3_y_pos" default="-0.5"/>
@@ -29,7 +30,6 @@
   <arg name="database_path" default="~/.ros/rtabmap"/>
   <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
   <arg unless="$(arg localization)" name="rtabmap_args" default="-d"/>
-
 
   <group ns="rtabmap_0">
     <node if="$(eval model=='waffle')" pkg="rtabmap_sync" type="rgbd_sync" name="rgbd_sync" output="screen">
@@ -70,8 +70,7 @@
       <param name="Kp/MaxFeatures"               type="string" value="-1"/>    
       <param name="RGBD/ProximityBySpace"        type="string" value="false"/>    
       <param name="RGBD/NeighborLinkRefining"    type="string" value="false"/>    
-      <param name="Mem/BinDataKept"              type="string" value="false"/>    
-      
+      <param name="Mem/BinDataKept"              type="string" value="$(arg save_point_cloud)"/>    
 
       <!-- localization mode -->
       <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
@@ -125,11 +124,10 @@
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
       <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>     
       <param name="Kp/MaxFeatures"               type="string" value="-1"/>    
-      <param name="RGBD/ProximityBySpace"        type="string" value="false"/>    
-      <param name="Mem/BinDataKept"              type="string" value="false"/>    
+      <param name="RGBD/ProximityBySpace"        type="string" value="false"/>     
       <param name="RGBD/NeighborLinkRefining"    type="string" value="false"/>    
+      <param name="Mem/BinDataKept"              type="string" value="$(arg save_point_cloud)"/>    
          
-
       <!-- localization mode -->
       <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
       <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
@@ -168,7 +166,7 @@
   </node>
   
   <node pkg="multi_explore" type="assigner.py" name="assigner" output="screen">
-    <param name="robot_namelist" value="$(arg first_tb3),$(arg second_tb3)"/>
+    <param name="robot_namelist" value="$(arg robot_name_list)"/>
     <param name="tb3_0_x" value="$(arg first_tb3_x_pos)"/>
     <param name="tb3_0_y" value="$(arg first_tb3_y_pos)"/>
     <param name="tb3_1_x" value="$(arg second_tb3_x_pos)"/>

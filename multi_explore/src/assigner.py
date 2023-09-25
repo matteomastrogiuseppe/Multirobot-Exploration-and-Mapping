@@ -31,7 +31,7 @@ class TaskManager:
         print("--- Created Robots ---")
 
         # Assigner gains 
-        self.k_i        = 0.9
+        self.k_i        = 0#.9
         self.k_c        = - 4
         self.k_change   = 0
 
@@ -167,7 +167,7 @@ class TaskManager:
         else:
             path = path+'new_policy/'
 
-        for i in range(1,6):
+        for i in range(1,11):
             folder = path+'sim_'+str(i)
             if os.path.exists(folder):
                 continue

@@ -82,7 +82,7 @@ class TaskManager:
                 # Final reward function
                 M[i,j] = info_gain + expl_cost + change_cost
 
-                # If robot is too close it likely cannot scan that area (use of RGB-D)
+                # If robot is too close, it likely cannot scan that area (use of RGB-D)
                 if ((robot.pose.x-fx)**2 + (robot.pose.y-fy)**2) < 0.25: 
                     M[i,j] = -np.nan
         return M

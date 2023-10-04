@@ -1,7 +1,7 @@
 \section{Results}
 \label{sec:results}
 Simulations are first run on a simpler map to test the system's navigation features, being the assignment of the exploration goal and the generation of a feasible path. Following, a more complex environment is selected to visualize the correctness of the reconstructed point cloud.
-We initially deploy two robots in the \textit{Turtlebot3\_stage\_4} world. The agents are capable of autonomously navigate through the environment, continuously exploring the detected frontiers and updating the global map. In Figure \ref{fig:path}, it can be observed how smooth paths are generated, connecting the robot with the frontier with most reward.
+We initially deploy two robots in the \textit{Turtlebot3 stage 4} world \cite{turtlebot3-simulation}. The agents are capable of autonomously navigate through the environment, continuously exploring the detected frontiers and updating the global map. In Figure \ref{fig:path}, it can be observed how smooth paths are generated, connecting the robot with the frontier with most reward.
 
 \begin{figure}[h]
   \begin{center}
@@ -15,8 +15,8 @@ We initially deploy two robots in the \textit{Turtlebot3\_stage\_4} world. The a
 \end{figure}
 
 We now move to analyzing the efficiency of the exploration strategy. We will compare a strategy which uses reward function only based on the distance robot-frontier, and one where the information gain is added.
-10 simulations are run with each strategy, the mean and standard deviation are reported. Initial 2D poses for the robots, in terms of (x, y, yaw), are set to $[-0.3, -0.5, \pi/2]$ and $[-1, -0.5, \pi/2]$. The vehicle control policy, in terms of linear and angular acceleration, is kept the same for both strategies.
-In Figure \ref{fig:results}, the explored area (in $m^2$) is compared with respect to the time required.
+10 simulations are run with each strategy, and the mean and standard deviation of the explored area overtime are reported. Initial 2D poses for the robots, in terms of (x, y, yaw), are set to $[-0.3, -0.5, \pi/2]$ and $[-1, -0.5, \pi/2]$. The vehicle control policy, in terms of linear and angular acceleration, is kept the same for both strategies.
+In Figure \ref{fig:results}, the explored area (in $m^2$) is compared with respect to the time required to map it.
 \begin{figure}[b]
   \begin{center}
     \includegraphics[width=0.49\textwidth]{img/mapping_speed.png}
@@ -29,7 +29,7 @@ In Figure \ref{fig:results}, the explored area (in $m^2$) is compared with respe
 As it can be observed, both reward functions typically result in comprehensive map exploration within a similar timeframe. However, the introduction of information gain significantly expedites the initial phases of exploration. Initially, the robot will prioritize large frontiers, leaving smaller areas as unexplored. In this way, it is possible to rapidly obtain a rough version of the map, where most of the macro-regions have been explored. While this behavior proves effective in simpler maps, it may lead to reduced efficiency in more complex environments. For larger spaces, complete exploration may take longer, as nearby frontiers are deprioritized and revisited only much later. Consequently, this approach necessitates fine-tuning of the exploration gain based on the specific map.
 
 Moving forward, we analyze the quality of the point cloud depending on the approaches proposed in the Section \ref{sec:point_cl}.
-Regarding the merged point clouds, there is minimal or no difference between the results obtained with the online and offline solutions. This is due to the fact that the initial guess for the initial pose of the robots was accurate, therefore in the end there is minimal or no roto-translation between the two results. The final merged point cloud can be seen in Figure \ref{fig:merged}, where the standard "Home" world from the Turtlebot3 project was used for the simulation \cite{turtlebot3-simulation}. 
+Regarding the merged point clouds, there is minimal or no difference between the results obtained with the online and offline solutions. This is due to the fact that the initial guess for the initial pose of the robots was accurate, therefore in the end there is minimal or no roto-translation between the two results. The final merged point cloud can be seen in Figure \ref{fig:merged}, where the standard \textit{Home} world from the Turtlebot3 project was used for the simulation \cite{turtlebot3-simulation}. 
 
 \begin{figure}[H]
   \begin{center}

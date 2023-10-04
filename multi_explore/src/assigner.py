@@ -36,7 +36,7 @@ class TaskManager:
         self.k_change   = 0
 
         # Store Data
-        self.collect_data = True
+        self.collect_data = False
         self.t_list = []
         self.clean_list = []
 

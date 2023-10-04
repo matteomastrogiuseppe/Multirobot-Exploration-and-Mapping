@@ -3,8 +3,11 @@ import numpy as np
 from numba import njit
 
 @njit(cache=True)
-def A_STAR(grid, dist_cost_map, p1, p2, k):
-
+def A_STAR(grid, dist_cost_map, p1, p2, k=1):
+    """Input grid shall be a m x n Numpy matrix, with 1 for grid cells representing obstacles, and 0 else.
+    The algorithm also requires a cost_map, of the same size of the grid. Finally, p1 and p2 are the starting and goal point, respectively.
+    """
+ 
     x_max, y_max = grid.shape
     
     # Initialize value function as inf, except for first point.
@@ -56,9 +59,8 @@ def A_STAR(grid, dist_cost_map, p1, p2, k):
                 # Only consider this point if it decreases the value function from the original point
                 if value[cur_x, cur_y] + L < value[x,y]:       
                     
-                    value[x,y] = value[cur_x,cur_y] + L 
-
                     # Definition of the heuristic: first consider points which get closer to the end goal and stay far from obstacles
+                    value[x,y] = value[cur_x,cur_y] + L                           # simple Dijkstra algorithm
                     cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )        # activate to get A*
                     dist_cost = distcost(dist_cost_map, max_dist_cost,x,y, k=k)   # activate to get smoothed A* 
                     heuristic = value[x,y]  + cart_distance + np.exp(dist_cost)

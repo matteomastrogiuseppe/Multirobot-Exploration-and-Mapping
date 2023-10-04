@@ -5,7 +5,7 @@
   </include>
 
   <!-- Arguments -->
-  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="model" default="waffle" doc="model type [burger, waffle, waffle_pi]"/>
   <arg name="open_rviz" default="true"/> 
   <arg name="rtabmap_viz" default="false"/> 
   <arg name="assign_rate" default="2"/>
@@ -45,6 +45,9 @@
       <param name="subscribe_depth" type="bool" value="false"/>
       <param     if="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="true"/>
       <param unless="$(eval model=='waffle')" name="subscribe_rgbd" type="bool" value="false"/>
+      <param name="gen_depth"               type="bool"   value="true"/>
+      <param name="gen_depth_decimation"    type="int"    value="4"/>
+      <param name="queue_size"              type="int"    value="10"/>
       <param name="subscribe_scan"      type="bool"   value="false"/>
       <param name="approx_sync"         type="bool"   value="true"/>
 
@@ -68,9 +71,19 @@
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
       <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>    
       <param name="Kp/MaxFeatures"               type="string" value="-1"/>    
+      <param name="Kp/MaxDepth" type="string" value="2"/>
       <param name="RGBD/ProximityBySpace"        type="string" value="false"/>    
       <param name="RGBD/NeighborLinkRefining"    type="string" value="false"/>    
+      <param name="RGBD/AngularUpdate"        type="string" value="0.01"/>
+      <param name="RGBD/LinearUpdate"         type="string" value="0.01"/>
+      <param name="RGBD/OptimizeFromGraphEnd" type="string" value="false"/>
       <param name="Mem/BinDataKept"              type="string" value="$(arg save_point_cloud)"/>    
+      <param name="Mem/ImagePreDecimation"  type="int" value="2"/>
+      <param name="Mem/ImagePostDecimation"  type="int" value="2"/> 
+      <param name="Mem/ReduceGraph" type="bool" value="true"/>
+      <param name="Odom/ImageDecimation"  type="int" value="2"/>
+      
+      
 
       <!-- localization mode -->
       <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
@@ -122,11 +135,21 @@
       <param name="Grid/CellSize"                type="string" value="0.05"/>
       <param name="Grid/3D"                      type="string" value="false"/>
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
-      <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>     
+      <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>    
       <param name="Kp/MaxFeatures"               type="string" value="-1"/>    
-      <param name="RGBD/ProximityBySpace"        type="string" value="false"/>     
+      <param name="Kp/MaxDepth"                   type="string" value="2"/>
+      <param name="RGBD/ProximityBySpace"        type="string" value="false"/>    
       <param name="RGBD/NeighborLinkRefining"    type="string" value="false"/>    
+      <param name="RGBD/AngularUpdate"        type="string" value="0.01"/>
+      <param name="RGBD/LinearUpdate"         type="string" value="0.01"/>
+      <param name="RGBD/OptimizeFromGraphEnd" type="string" value="false"/>
       <param name="Mem/BinDataKept"              type="string" value="$(arg save_point_cloud)"/>    
+      <param name="Mem/ImagePreDecimation"  type="int" value="2"/>
+      <param name="Mem/ImagePostDecimation"  type="int" value="2"/> 
+      <param name="Mem/ReduceGraph" type="bool" value="true"/>
+      <param name="Odom/ImageDecimation"  type="int" value="2"/>
+      
+      
          
       <!-- localization mode -->
       <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
@@ -181,4 +204,5 @@
   <node pkg="multi_explore" type="robot_control.py" name="$(arg second_tb3)_controller" output="screen">
     <param name="robot_name" value="$(arg second_tb3)"/>
   </node>
+
 </launch>

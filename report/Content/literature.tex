@@ -1,0 +1,73 @@
+\section{Related Work}
+\label{sec:literature}
+
+    
+
+\begin{comment}
+Talk about:
+\begin{itemize}
+    \item We will use the ROS framework. So we need to choose between the available mapping libraries. RTAB-Map is a good fit for our needs, since it reaches state-of-the-art levels of accuracy. Talk about SLAM, visual odometry, dense point cloud reconstruction, say that they are all top level. Most importantly, it also generates a 2D occupancy-grid, like lidar-based algorithms do. Occupancy grids are the starting point of autonomous exploration and navigation algorithms. And so on.
+    
+
+\end{itemize}
+\end{comment}
+
+
+\subsection{Multi Visual SLAM}
+
+In multi-robot setups, where data gathering and estimating the robots' positions are distributed among multiple entities, communication between these agents becomes essential. Collaborative SLAM (C-SLAM) and multi-robot systems, in general, involve a critical distinction between two perspectives: global and local. In a global, centralized, approach, the estimator has a comprehensive view of the entire team of robots, making estimations based on perfect knowledge of each robot's measurements. This means it takes into account all the data from all robots collectively \cite{lajoie2021towards}. However, as the number of robots grows, trying to address centralized C-SLAM becomes impractical due to communication limitations. Therefore, a more effective way to handle scalability is by tackling C-SLAM in a decentralized fashion. In this approach, each robot independently creates its own local map and combines some information from other robots, along with measurements taken between robots, to reach a solution that's specific to its immediate surroundings. Through a series of interactions with its neighboring robots, the local solution of each robot gradually aligns with a solution that matches the overall global reference frame. An alternative to this approach is the complete C-SLAM approach adopted for large-scale environments during the DARPA Subterranean Challenge \cite{denniston2022loop}, or the one presented in the COVINS project \cite{schmuck2021covins}. In this kind of approaches the back-end (generating state estimates using all measurements gathered) and front-end (handling perception-related tasks) of C-SLAM do not necessarily occur fully on a single robot anymore depending on the sensing, communication, and estimation strategies. 
+
+Focusing only on the front-end, the one in
+charge of producing landmark estimates, odometry measurements, and both intra-robot and
+inter-robot loop closures, we can see two distinctive typologies of loop closures: direct and indirect. Direct inter-robot loop closures occur when two robots meet, and they are able to estimate their current relative location with respect to each other through direct sensing. Indirect inter-robot loop closures instead occur when the robots examine their maps to identify areas that they both have explored. By comparing these shared areas, the robots can figure out how they are positioned relative to each other and estimate the transformations needed to align their maps.
+
+In this latter approach, where loop closure detection is basically the extension of single-robot loop closure detection
+to multiple maps, there are different visual-based solutions:
+
+\begin{itemize}
+    \item \textbf{Visual bags of binary words:} it is based on feature extraction and visual vocabulary as clusters. The main concept is to represent images using binary descriptions, which are highly efficient for tasks that need to be done quickly, like recognizing objects or places in real-time. These descriptions are like digital fingerprints that capture unique visual details in the images, making it easier and faster to find and identify specific locations or scenes \cite{galvez2012bags}.
+
+    \item \textbf{Deep learning:} this method is based on place recognition with deep learning, where fixed-length vector represent each input image. This representation encodes the visual content of the image in a way that is suitable for efficient matching and retrieval and computation through Convolutional Neural Networks: the whole systems is called NetVLAD (Network Vector of Locally Aggregated Descriptors) \cite{arandjelovic2016netvlad}.
+
+\end{itemize}
+
+There are also different methods starting from 3D point clouds:
+
+\begin{itemize}
+    \item \textbf{Global point cloud descriptors:} this is a combination of the previously mentioned NetVLAD and the novel  PointNet architecture, designed for processing point cloud data and extraction of meaningful features from unordered point clouds \cite{uy2018pointnetvlad}. 
+
+    \item \textbf{Place recognition:} based also on a ICP algorithm, it focuses on the determination of reduced observability and geometric degeneracy to avoid closing loops in ambiguous areas with high level of geometric degeneracy as it could result in catastrophic distortions of the map. Using this solution, areas with high level of geometric degeneracy that can lead to data association ambiguity and spurious loop closures are removed from loop closure consideration \cite{ebadi2021dare}.
+
+\end{itemize}
+
+
+
+
+\subsection{Exploration Strategy}
+\label{sec:literature_exploration}
+
+Given the capability of each robot to independently construct its own map, an exploration strategy must be defined.  This strategy serves as the guiding principle that allows the robot to autonomously navigate and expand its mapped terrain.
+The widely adopted and conventional approach is known as frontier-based exploration \cite{frontier_based}. Frontiers denote those spatial regions situated at the interface between explored and uncharted territories. By directing the robot's movement towards these frontiers, it can gain information about new, unexplored regions. Eventually, moving to successive frontiers, the robot will constantly increase its knowledge of the map.
+
+Multi-robot, frontier-based exploration mainly revolves around the the detection of frontiers in the global map and the assignment of these to the individual robots as navigation goals.
+
+Frontiers can be detected using edge detection techniques on the grid-map \cite{frontier_based}. This method capitalizes on the pronounced contrast between pixels, achieving reasonable speed and good accuracy. Filtering out obstacles, it is possible to identify safe regions to be explored. It's worth noting that while this technique is exclusively applicable in 2D environments, this limitation does not impede its utility in our specific context.
+
+Umari and Mukhopadhyay \cite{rrt_exploration} propose the use of Rapidly-exploring Random Trees (RRT) to detect frontiers. As a sampling-based approach, RRT stands out for its exceptional computational efficiency, making it versatile for deployment in 3D environments and its proficiency in addressing path planning challenges. However, for exploration based only on RGB-D cameras, it is crucial that the robot targets the centroid of the unexplored area and that it creates a path which steers outside of the obstacles. This is particularly vital for scenarios where algorithms like RTAB-Map require ample clearance from obstacles to reconstruct an accurate occupancy grid. For this reason, we want to make sure to find a point as far from obstacles as possible, rather than opting for arbitrary points along the edge. Additionally, the path itself should be as smooth as possible and which steers clear from obstacles, a level of performance not readily achieved by employing a straightforward RRT approach.
+
+Efficiently assigning the identified frontiers to individual robots necessitates a strategy that minimizes redundancy and promotes a balanced and effective distribution. Two primary factors come into play here: the formulation of a reward function and the subsequent policy for assignment based on this function. Numerous assignment policies have been proposed \cite{allocation}, but in general, they predominantly rely on the robot-frontier distance as the primary metric. Particularly when dealing with a limited number of robots, the distribution of frontiers among the robot team tends to take precedence over other factors, such as the value function we define.
+Consequently, we will introduce a reward function designed to encompass not only the robot-goal distance but also the potential information gain achievable by exploring a specific frontier. In doing so, we aim to strike a balance between robot proximity to frontiers and the value of exploring those frontiers, thus optimizing the allocation of tasks among the robot team.
+
+    
+\subsection{Path planning:}
+Path planning is a core and widespread problem in robotics. Over the years, a variety of methods have been suggested to address this issue \cite{path_planning_review}. Hereafter, we outline the most commonly employed strategies, highlighting both their principal benefits and limitations.
+\begin{itemize}
+    \item \textbf{Sampling Based Methods}: they construct a path by randomly sampling points within the configuration space, which represents all possible robot configurations. These sampled points are then connected to form a feasible path. Since they focus solely on the configuration space, they excel in scenarios with numerous motion constraints. Their computational efficiency makes them particularly well-suited for navigating 3D environments or higher-dimensional search spaces.
+    Baseline algorithms, such as the RRT algorithm, are capable of finding paths but do not offer optimality guarantees. Enhanced variants like RRT* yield improved results and can, in theory, provide an optimal path with an infinite number of samples \cite{rrt_star}. Generally, they exhibit limited sensitivity to the environment, but their convergence may decelerate significantly in the presence of multiple obstacles..
+    \item \textbf{Graph Search Techniques}: these algorithms explore a graph (in this case a grid-map), while taking into account various cost factors and heuristic estimates for cell-to-cell transitions. Prominent examples include the Dijkstra Algorithm and the optimal A* algorithm. They can effectively and reliably find the shortest path in a 2D grid environment. Nevertheless, their computational cost significantly escalate when applied to 3D settings, leading to reduced usage in higher-dimensional spaces.
+    \item \textbf{Artificial Potential Field}: typically applied in the context of \textit{local} path planning due to its strong suitability for obstacle avoidance. Notably, for extended trajectories, robots are susceptible to becoming trapped in local minima within the potential field.
+    \item \textbf{AI-based Methods}: neural networks find applications also in path planning, as they can implicitly grasp the mapping from perception space to behavioral space. For instance, Deep Q-Learning-based methods have been explored in this context \cite{q_learning}. However, handling vast and intricate environments remains a challenge for neural networks, and a universally ideal neural network architecture for this task has yet to emerge.
+    \item \textbf{Bionic Algorithms}: these approaches draw inspiration from the collective behaviors observed in biological swarm intelligence within the natural world. Notable examples include genetic algorithms, ant colony optimization, particle swarm optimization, and the grey wolf optimizer. This category of methods has garnered significant attention in recent research. Nevertheless, they still face a number of drawbacks, such as challenges in scaling to higher-dimensional spaces and susceptibility to the precise tuning of parameters.
+\end{itemize}
+In specific, in this work we will present a method which fuses the core ideas of Graph Search Algorithms and Artificial Potential Fields.
+

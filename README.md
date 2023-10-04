@@ -3,7 +3,7 @@
 ## Project Overview:
 Final project of the course "Design Methods for Unmanned Vehicles" of University of Trento.
 
-The work aims at achieving autonomous exploration and mapping in an unknown environment by deploying multiple robots, each equipped with an RGB-D camera. The project has been developed as a ROS (Noetic) package, developed in Python3. Turtlebot was used as robot model, but the core can be easily deployed to other models.
+The work aims at achieving autonomous exploration and mapping in an unknown environment by deploying multiple robots, each equipped with an RGB-D camera. The project has been developed as a ROS (Noetic) package, developed in Python3 and C++. _Turtlebot_ was used as robot model, but the core can be easily deployed to other models.
 
 Simulation general scheme:
 

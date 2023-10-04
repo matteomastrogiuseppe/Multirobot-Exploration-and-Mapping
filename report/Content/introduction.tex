@@ -1,0 +1,52 @@
+\section{Introduction}
+% ========================================= %
+%\subsection{Context of the work. Scenarios where the project can be used. Open challenges and issues}
+Exploration and mapping of unknown environments constitute core tasks in the field of robotics, with profound implications across various domains. Applications range from autonomous driving to search and rescue missions, from inspection in confined spaces to industrial automation tasks demanding spatial awareness. In these applications, the ability to generate accurate and comprehensive maps of the environment is key for the success of robotic systems. The evolution of sensor technologies and algorithms has led to the development of very sophisticated solutions to the Simultaneous Localization and Mapping (SLAM) problem. This has empowered these robotic systems to navigate, perceive, and map complex and dynamic environments with remarkable precision. 
+
+The incorporation of RGB-D cameras, capable of capturing both color and depth information, represents a pivotal advancement in providing robots with sophisticated perception capabilities. Their ability to provide rich, three-dimensional data in real-time has opened up new possibilities for improving the quality and efficiency of mapping tasks. 
+
+While single-robot exploration and mapping using RGB-D sensors have shown great results, the scalability and effectiveness of such systems can be significantly enhanced through the collaboration of multiple robots. The possibility to deploy multiple robots with capabilities of self localization and mapping allows to store single portions of map that are computationally lighter and that can be manipulated and merged in post production.
+
+Despite remarkable advancements, several challenges and open issues persist in this domain. The fusion of RGB-D sensors to construct accurate point clouds and 3D maps remains a complex task, demanding real-time processing capabilities and robust algorithms to handle varying environmental conditions. The collaborative aspect of multi-robot systems introduces coordination challenges, where robots must work synergistically, share information, and avoid conflicts to achieve their common objectives. Exploration strategies necessitate refinement to optimize resource allocation, reduce redundancy, and ensure comprehensive coverage of unknown terrains. Path planning algorithms need to strike a balance between efficiency and safety, drawing routes that circumvent obstacles while minimizing travelling times.
+
+
+% ========================================= %
+%\subsection{Possible solutions, new technology, recent innovations. Introduce work done and goals}
+Recent approaches to visual SLAM are deploying direct visual motion methods or feature-based methods \cite{macario2022comprehensive}. The latter typically extract and track distinct features, such as keypoints or corners, from images and use the relative motion of these features to estimate the camera pose. Direct visual motion methods do not rely on distinct feature points, but instead operate directly on the raw pixel intensities of the images. 
+For what concerns the exploration task, different strategies for robot swarms have been proposed, aiming at full autonomy in the process. Techniques such as distributed mapping, where robots share and fuse local maps, and frontier-based exploration, guiding robots to unexplored regions, enhance efficiency and adaptability. 
+At the same time, contemporary path planning strategies for robots leverage advanced techniques like sampling-based methods, bionic algorithms, and artificial potential fields. These approaches optimize obstacle avoidance and allow the robot to adapt to dynamic environments.
+Additionally, the integration of artificial intelligence and machine learning techniques holds the promise of enhancing the general adaptability and autonomy of these robotic systems, in all of their aspects.
+
+
+In this context, our research introduces a general framework which aims at achieving complete autonomous exploration and mapping, using multiple robots each equipped with an RGB-D camera. This is achieved by investigating the problem in its sub-challenges: SLAM solution and point cloud handling, multi-robot exploration strategy, and path planning.
+We explore latest frontiers in point cloud processing, incorporating state-of-the-art algorithms to enhance map accuracy. Refined exploration strategies are discussed, using frontier-based approaches to intelligently guide multi-robot teams. Path planning is enhanced through the integration of artificial potential fields derived from Fast Marching Methods (FMM) to the general A*, ensuring both obstacle avoidance and optimality.
+
+
+% ========================================= %
+%\subsection{Contributions, as a list}
+The main contributions of this work can be outlined as follows:
+\begin{itemize}
+    \item Formalizing a global strategy to use in multi-robot exploration, using RGB-D sensors. The goal is to cover the main, relevant problematics associated with the task, analyze them, and propose a suitable combination of methods and techniques.
+    \item Deploying the state-of-the-art RTAB-Map software to multiple robots and merging the final maps and point clouds. In this way, the solution of the SLAM problem is decentralized, and it is easier to tackle more complex environments.
+    \item Investigating a strategy to autonomously explore an unknown environment with multiple robots, making sure that the agents are coordinated and effectively distributed.
+    \item Proposing a path planning algorithm which combines graph search methods with artificial potential fields, ensuring collision avoidance and efficient trajectories.
+\end{itemize}
+% ========================================= %
+%\subsection{Report Organization}
+The rest of the report is organized as follows. Related work is reviewed in Section \ref{sec:literature}. Section \ref{sec:methods} discusses the methodology used in this project work. All aspects of the proposed framework are described, and the reasoning behind the adoption of the techniques is explained. Simulation results are presented in Section \ref{sec:results} and the effectivness of our framework is shown. Finally, conclusions are drawn in Section \ref{sec:conclusion}, along with a brief discussion of the limitations of the present work and possibilities for further implementations.
+
+
+
+% ========================================= %
+
+%with algorithms like Iterative Closest Point (ICP) and truncated-ICP (trICP), taking in consideration both the translation and rotations between the maps obtained. 
+%Nonetheless, building a fast, real time, SLAM and point-cloud reconstructor framework using an RGB-D camera and ICP-like algorithms is a challenging task, because it requires a high computational effort to obtain translations and rotations directly form the recorded point clouds.
+
+%Given these difficulties, the approaches to visual SLAM present in literature are deploying direct visual motion methods or feature-based methods \cite{macario2022comprehensive}. Direct visual motion methods work with the raw image intensities and directly optimize for the camera pose and the scene geometry. They do not rely on distinct feature points, but instead operate directly on the raw pixel intensities of the images. Feature based methods typically extract and track distinct features (such as keypoints or corners) from images and use the relative motion of these features to estimate the camera pose. 
+%RGB-D based SLAM excels when the environment is large and rich in terms of features to be tracked for loop closures. 
+%Loop closure is a pivotal process in SLAM using visual RGB-D mapping. It plays a critical role in maintaining the accuracy of robot trajectories and maps by recognizing when the robot revisits previously explored locations and correcting any accumulated errors in pose estimation and mapping. To achieve loop closure, distinctive visual features are extracted from RGB-D images captured by the sensor. These features are then compared to past observations to identify potential matches. Geometric verification techniques are used to confirm loop closure by estimating the transformation between current and past observations. If this transformation meets predefined criteria, a loop closure is declared, ensuring accurate SLAM performance for three-dimensional modeling in real-time with low sensor cost utilization. Loop closure information is integrated into a graph-based SLAM framework, where optimization algorithms refine the entire map and trajectory for global consistency. This process greatly improves the reliability and accuracy of the mapping system, allowing it to navigate in real-world environments with minimal drift and error accumulation. 
+
+%The loop closure detection becomes no more trivial when this approach is applied to multi-robot exploration and mapping. The ability to create real-time maps of the environment while accurately tracking the position and pose of multiple robots is crucial for various applications to speed up the activity required from the tasks, being it autonomous navigation, surveillance, search and rescue, or collaborative mapping. Multi-Visual Loop closure detection has seen notable progress. The algorithms now employ sophisticated techniques like bag-of-words, global feature descriptors, and deep learning-based methods to identify and close loops in the map, reducing drift errors and enhancing long-term accuracy.
+
+
+

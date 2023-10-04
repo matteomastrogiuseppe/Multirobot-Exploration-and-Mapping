@@ -1,6 +1,18 @@
 \section{Conclusion}
 \label{sec:conclusion}
 This work has presented a generic approach for multi-robot exploration and mapping using RGB-D cameras as main sensor. The problem has been tackled by considering its sub-challenges, namely SLAM and point cloud handling, exploration strategy and path planning.
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=0.49\textwidth]{img/example.png}
+  \end{center}
+  \caption[]{
+    \textbf{Particular on points selection} 
+  }
+  \label{fig:example}
+\end{figure}
+
+
 Overall, the proposed framework is capable of achieving an accurate mapping, leveraging the capabilities of the RTAB-Map software and point cloud merging algorithms. At the same time, the proposed strategies for exploration and navigation guarantee efficiency and safety in obstacle avoidance.
 
 Future work will focus on testing the system with a larger number of agents, potentially deploying the software on real robots. Any knowledge a-priori of the environment, like QR codes, could be used as loop closure triggers, relieving the software from identifying closures from visual features. In the exploration task, more complex reward functions can be defined and new assignment strategies can be tested. 

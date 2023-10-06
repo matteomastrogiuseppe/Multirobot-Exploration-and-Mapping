@@ -11,7 +11,10 @@ Simulation general scheme:
 <img src="./images/simulation.png" alt="Simulation Environment" width="80%"> 
 </p>
 
-The solution of the SLAM problem and point-cloud re-construnction is handled using RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global point_cloud of the environment in real time. 
+The solution of the SLAM problem and point-cloud re-construnction is handled using RTAB-Map, by [IntRoLab](https://github.com/introlab). This is done for each robot, and the resulting maps are fed into a map marger, which generates a global point_cloud of the environment in real-time.
+<p align="center" display="inblock">
+<img src="./images/realtime_merge.png" alt="Frontiers" width="50%"> 
+</p> 
 
 A OpenCV-based frontier detector identifies the regions to be explored in the map. 
 <p align="center" display="inblock">

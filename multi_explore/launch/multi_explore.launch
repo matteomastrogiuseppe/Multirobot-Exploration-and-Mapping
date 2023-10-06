@@ -11,7 +11,8 @@
   <arg name="assign_rate" default="2"/>
   <arg name="save_point_cloud" default="true"/> <!-- Disable this to go faster -->
   <arg name="merge_point_cloud" default="true"/> <!-- Disable this to go much faster -->
-  <arg name="grid_resolution" default="0.06"/>
+  <arg name="use_scan" default="false"/>
+  <arg name="grid_resolution" default="0.05"/>
 
   <arg name="first_tb3"  default="tb3_0"/>
   <arg name="second_tb3" default="tb3_1"/>
@@ -50,7 +51,7 @@
       <param name="gen_depth"               type="bool"   value="true"/>
       <param name="gen_depth_decimation"    type="int"    value="4"/>
       <param name="queue_size"              type="int"    value="10"/>
-      <param name="subscribe_scan"      type="bool"   value="false"/>
+      <param name="subscribe_scan"      type="bool"   value="$(arg use_scan)"/>
       <param name="approx_sync"         type="bool"   value="true"/>
 
 
@@ -94,7 +95,7 @@
 
     <!-- visualization with rtabmap_viz -->
     <node if="$(arg rtabmap_viz)" pkg="rtabmap_viz" type="rtabmap_viz" name="rtabmap_viz" args="-d $(find rtabmap_demos)/launch/config/rgbd_gui.ini" output="screen">
-      <param name="subscribe_scan"   type="bool"   value="false"/>
+      <param name="subscribe_scan"   type="bool"   value="$(arg use_scan)"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="/tb3_0/base_footprint"/>
       <param name="approx_sync"      type="bool"   value="false"/>

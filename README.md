@@ -91,8 +91,11 @@ For a first development, the `TurtleBot` environment was used. Follow the uffici
 `RTAB-Map` was used for solution of SLAM and mapping.
 `multirobot_map_merge` was used to merge the robot individual maps.
 ```bash
-cd ~/turtle_ws/src
 sudo apt install ros-$ROS_DISTRO-rtabmap-ros
+```
+
+```bash
+cd ~/turtle_ws/src
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3
 git clone -b noetic-devel https://github.com/hrnr/m-explore/tree/noetic-devel/map_merge

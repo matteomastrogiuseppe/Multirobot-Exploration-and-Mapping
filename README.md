@@ -111,11 +111,11 @@ To run the simulation:
 roslaunch multi_explore multi_explore.launch
 ```
 
-The global map generally spawns after 20 seconds in ROS time, because of the map merger initial overhead. The first run will take more time, because some functions will be compiled in machine code through the _Numba_ library. After the first run, everything is stored in the cache, so no need to wait for the compilation at every launch.
+- The global map generally spawns after 20 seconds in ROS time, because of the map merger initial overhead. 
+- The first run will take more time, because some functions will be compiled in machine code through the _Numba_ library. After the first run, everything is stored in the cache, so no need to wait for the compilation at every launch.
+- The merged pointcloud is already present in RViz, but it is disabled by default due to heavy computational load.
 
-- Item dsdnk
-
-Final point-cloud is stored into a `.db` database file. In order to obtain the final Point Cloud run the following module in a bash terminal 
+To create the final point-cloud:
 
 ```bash
 rtabmap-databaseViewer

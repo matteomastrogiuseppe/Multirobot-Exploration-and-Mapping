@@ -87,8 +87,7 @@ source ~/.bashrc
 ```
 
 ### Install Dependecies:
-For a first development, the `TurtleBot` environment was used. Follow the ufficial procedure at [Gazebo Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/#gazebo-simulation), or simply install via Debian.
-`RTAB-Map` was used for solution of SLAM and mapping.
+For a first development, the `TurtleBot` environment was used. `RTAB-Map` was used for solution of SLAM and mapping.
 `multirobot_map_merge` was used to merge the robot individual maps.
 ```bash
 sudo apt install ros-$ROS_DISTRO-rtabmap-ros
@@ -111,13 +110,15 @@ To run the simulation:
 roslaunch multi_explore multi_explore.launch
 ```
 
-- The global map generally spawns after 20 seconds in ROS time, because of the map merger initial overhead. 
+- The global gridmap generally spawns after 20 seconds in ROS time, because of the map merger initial overhead. 
 - The first run will take more time, because some functions will be compiled in machine code through the _Numba_ library. After the first run, everything is stored in the cache, so no need to wait for the compilation at every launch.
-- The merged pointcloud is already present in RViz, but it is disabled by default due to heavy computational load.
+- The merged pointcloud is already integrated in RViz, but it is disabled by default due to heavy computational load.
 
-To create the final point-cloud:
+To save and export the final RTAB-Map point-clouds:
 
 ```bash
 rtabmap-databaseViewer
 ```
 Import the .db file, and export the final point-cloud as a .ply file.
+
+A more refined point-cloud (e.g. deletes overlapping points) can be obtained through "PC_merger.cpp". It mostly makes use of the _ICP_ algorithm to align and merge the point-clouds. Using a KD-tree data structure, it is possible to efficiently define the closest points between the two maps, which is at the basis of the ICP registration step.

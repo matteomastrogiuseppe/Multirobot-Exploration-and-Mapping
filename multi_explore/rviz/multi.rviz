@@ -353,8 +353,8 @@ Visualization Manager:
       Download map: false
       Download namespace: rtabmap
       Enabled: false
-      Filter ceiling (m): 0.15
-      Filter floor (m): 0
+      Filter ceiling (m): 0
+      Filter floor (m): 0.15
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0

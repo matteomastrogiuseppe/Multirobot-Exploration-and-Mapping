@@ -103,7 +103,7 @@ namespace map_merge
   void MapMerger::timerCallback(const ros::TimerEvent& msg) 
   {
      
-    cout << "timer called" << endl;
+    //cout << "timer called" << endl;
     if (update_now_) 
     {
       std::unique_lock<std::mutex> lock(mutex_);
@@ -135,7 +135,7 @@ namespace map_merge
             rtabmap_.process(data, iter->getPose(), odom_linear_variance_, odom_angular_variance_);
             map1_len_++;
         }
-        cout << "Scanned Map 1: " << temp_nodes_map1.size() << " nodes in map." << endl;
+        //cout << "Scanned Map 1: " << temp_nodes_map1.size() << " nodes in map." << endl;
     }
 
     if (map2_) 
@@ -146,7 +146,7 @@ namespace map_merge
             rtabmap_.process(data, iter->getPose(), odom_linear_variance_, odom_angular_variance_);
             map2_len_++;
         }
-        cout << "Scanned Map 2: " << temp_nodes_map2.size() << " nodes in map." << endl;
+        //cout << "Scanned Map 2: " << temp_nodes_map2.size() << " nodes in map." << endl;
     }
 
     // Update and publish combined map

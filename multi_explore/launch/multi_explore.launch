@@ -11,6 +11,7 @@
   <arg name="assign_rate" default="2"/>
   <arg name="save_point_cloud" default="true"/> <!-- Disable this to go faster -->
   <arg name="merge_point_cloud" default="true"/> <!-- Disable this to go much faster -->
+  <arg name="grid_resolution" default="0.06"/>
 
   <arg name="first_tb3"  default="tb3_0"/>
   <arg name="second_tb3" default="tb3_1"/>
@@ -67,7 +68,7 @@
       <param name="Reg/Force3DoF"                type="string" value="true"/>
       <param name="Rtabmap/DetectionRate"        type="string" value="2"/>
       <param name="Grid/RayTracing"              type="string" value="true"/>
-      <param name="Grid/CellSize"                type="string" value="0.05"/>
+      <param name="Grid/CellSize"                type="string" value="$(arg grid_resolution)"/>
       <param name="Grid/3D"                      type="string" value="false"/>
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
       <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>    
@@ -133,7 +134,7 @@
       <param name="Reg/Force3DoF"                type="string" value="true"/>
       <param name="Rtabmap/DetectionRate"        type="string" value="2"/>
       <param name="Grid/RayTracing"              type="string" value="true"/>
-      <param name="Grid/CellSize"                type="string" value="0.05"/>
+      <param name="Grid/CellSize"                type="string" value="$(arg grid_resolution)"/>
       <param name="Grid/3D"                      type="string" value="false"/>
       <param name="GridGlobal/MinSize"           type="string" value="20"/>
       <param name="Grid/MaxGroundHeight"         type="string" value="0.15"/>    

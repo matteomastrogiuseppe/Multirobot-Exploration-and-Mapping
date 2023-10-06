@@ -9,7 +9,8 @@
   <arg name="open_rviz" default="true"/> 
   <arg name="rtabmap_viz" default="false"/> 
   <arg name="assign_rate" default="2"/>
-  <arg name="save_point_cloud" default="false"/> <!-- Disable this to go faster -->
+  <arg name="save_point_cloud" default="true"/> <!-- Disable this to go faster -->
+  <arg name="merge_point_cloud" default="true"/> <!-- Disable this to go much faster -->
 
   <arg name="first_tb3"  default="tb3_0"/>
   <arg name="second_tb3" default="tb3_1"/>
@@ -95,7 +96,7 @@
       <param name="subscribe_scan"   type="bool"   value="false"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="/tb3_0/base_footprint"/>
-      <param name="approx_sync"      type="bool"   value="true"/>
+      <param name="approx_sync"      type="bool"   value="false"/>
       <remap from="odom"            to="/tb3_0/odom"/>
       <remap from="scan"            to="/tb3_0/scan"/>
     </node>
@@ -160,7 +161,7 @@
       <param name="subscribe_scan"   type="bool"   value="false"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="/tb3_1/base_footprint"/>
-      <param name="approx_sync"      type="bool"   value="false"/>
+      <param name="approx_sync"      type="bool"   value="true"/>
       <remap from="odom"            to="/tb3_1/odom"/>
       <remap from="scan"            to="/tb3_1/scan"/>
     </node>
@@ -203,6 +204,52 @@
 
   <node pkg="multi_explore" type="robot_control.py" name="$(arg second_tb3)_controller" output="screen">
     <param name="robot_name" value="$(arg second_tb3)"/>
+    
+    
+    
+    
+    
   </node>
+  <!-- Topics where mapData is being published from each agent -->
+  <arg name="map1_topic"            default="/rtabmap_0/mapData"/>
+  <arg name="map2_topic"            default="/rtabmap_1/mapData"/>
+
+  <!-- Topic where the combined MapData will be published -->
+  <arg name="combined_map_topic"    default="comboMapData"/>
+  
+  <!-- boolean arguments used when generating the map same as variables -->
+  <!-- used when calling rtabmap/get_map_data service -->
+  <arg name="merge_map_optimized"   default="true"/>
+  <arg name="merge_map_global"      default="true"/>
+
+  <!-- tf frame that published combined map is connected to --> 
+  <arg name="base_frame"            default="map"/>
+  
+  <!-- Location where combined map rtabmap database file will be saved -->
+  <arg name="db_location"           default="/home/.ros/mapmerge.db"/>
+
+  <!-- Location of rtabmap config parameter file, uncomment to use -->
+  <!--<arg name="config_path"         default=""/>-->
+
+  <!-- How ofted to merge the maps together (in seconds) -->
+  <arg name="map_merge_frequency"   default="1"/>
+  
+  <!-- Parameters used in map optimization -->
+  <arg name="odom_linear_variance"  default="0.0001"/>
+  <arg name="odom_angular_variance" default="0.0005"/>
+
+  <!-- Launch Map Merger Node -->
+  <node name="map_merger" pkg="map_merger" type="map_merger" output="screen">
+    <param name="map1_topic"            value="$(arg map1_topic)"/>
+    <param name="map2_topic"            value="$(arg map2_topic)"/>
+    <param name="combined_map_topic"    value="$(arg combined_map_topic)"/>
+    <param name="merge_map_optimized"   value="$(arg merge_map_optimized)"/>
+    <param name="merge_map_global"      value="$(arg merge_map_global)"/>
+    <param name="base_frame"            value="$(arg base_frame)"/>
+    <param name="db_location"           value="$(arg db_location)"/>
+    <param name="map_merge_frequency"   value="$(arg map_merge_frequency)"/>
+    <param name="odom_linear_variance"  value="$(arg odom_linear_variance)"/>
+    <param name="odom_angular_variance" value="$(arg odom_angular_variance)"/>
+  </node>  
 
 </launch>

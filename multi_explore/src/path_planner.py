@@ -24,9 +24,6 @@ def A_STAR(grid, dist_cost_map, p1, p2, k=1):
     priority_queue = []
     priority_queue.append((0., (p1[0],p1[1])))
 
-    # Maximum of the potential field map
-    max_dist_cost = np.max(dist_cost_map)
-
     # Possible grid transitions
     dxy = [[0,1], [1,0], [-1,0], [0,-1], [1,1], [1,-1], [-1,1], [-1,-1]]
     
@@ -55,15 +52,15 @@ def A_STAR(grid, dist_cost_map, p1, p2, k=1):
 
             # Don't consider if already visited
             if ~visited[x,y]:
+                dist_cost = k*dist_cost_map[x,y]   # activate to get smoothed A*, else 0
 
                 # Only consider this point if it decreases the value function from the original point
-                if value[cur_x, cur_y] + L < value[x,y]:       
+                if value[cur_x, cur_y] + L + dist_cost < value[x,y]:       
                     
                     # Definition of the heuristic: first consider points which get closer to the end goal and stay far from obstacles
-                    value[x,y] = value[cur_x,cur_y] + L                           # simple Dijkstra algorithm
+                    value[x,y] = value[cur_x,cur_y] + L + dist_cost               # Value function, keeps track of total cost of the path
                     cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )        # activate to get A*
-                    dist_cost = distcost(dist_cost_map, max_dist_cost,x,y, k=k)   # activate to get smoothed A* 
-                    heuristic = value[x,y]  + cart_distance + np.exp(dist_cost)
+                    heuristic = value[x,y]  + cart_distance
                     # Insert this new point in the priority queue
                     heapq.heappush(priority_queue, (heuristic, (x, y)))
                     # Store the transition to retrieve the path 
@@ -90,9 +87,3 @@ def A_STAR(grid, dist_cost_map, p1, p2, k=1):
 
     return path
 
-@njit(cache=True)
-def distcost(map, max, x, y, k=1):
-    # FMM Potential map has larger values when far from obstacles, 
-    # so use the difference with respect to the maximum value to create a cost
-    cost = map[x,y]
-    return k*(max - cost)

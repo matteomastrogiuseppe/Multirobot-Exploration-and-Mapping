@@ -3,7 +3,7 @@
 ## Project Overview:
 Final project of the course "Design Methods for Unmanned Vehicles" of University of Trento.
 
-The work aims at achieving autonomous exploration and mapping in an unknown environment by deploying multiple robots, each equipped with an RGB-D camera. The project has been developed as a ROS (Noetic) package, developed in Python3 and C++. _Turtlebot_ was used as robot model, but the core can be easily deployed to other models.
+This work aims at achieving autonomous exploration and mapping in an unknown environment by deploying multiple robots, each equipped with an RGB-D camera. The project has been developed as a ROS (Noetic) package, developed in Python3 and C++. _Turtlebot_ was used as robot model, but the core can be easily deployed to other models.
 
 Simulation general scheme:
 
@@ -115,7 +115,7 @@ roslaunch multi_explore multi_explore.launch
 
 - The global gridmap generally spawns after 20 seconds in ROS time, because of the map merger initial overhead. 
 - The first run will take more time, because some functions will be compiled in machine code through the _Numba_ library. After the first run, everything is stored in the cache, so no need to wait for the compilation at every launch.
-- The merged pointcloud is already integrated in RViz, but it is disabled by default due to heavy computational load.
+- The real-time, merged pointcloud is already integrated in RViz, but it is disabled by default due to heavy computational load.
 
 To save and export the final RTAB-Map point-clouds:
 

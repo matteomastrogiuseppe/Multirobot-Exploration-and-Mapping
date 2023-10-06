@@ -92,11 +92,11 @@ For a first development, the `TurtleBot` environment was used. Follow the uffici
 `multirobot_map_merge` was used to merge the robot individual maps.
 ```bash
 cd ~/turtle_ws/src
+sudo apt install ros-$ROS_DISTRO-rtabmap-ros
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3_simulations
 git clone -b noetic-devel https://github.com/ROBOTIS-GIT/turtlebot3
-git clone -b noetic-devel https://github.com/introlab/rtabmap_ros
 git clone -b noetic-devel https://github.com/hrnr/m-explore/tree/noetic-devel/map_merge
-git clone -b master       https://github.com/jacobmoroni/map_merger/tree/f2fbf7b13614fb50460467676f4a10b1e95a9b8d
+git clone -b master       https://github.com/jacobmoroni/map_merger
 cd ~/turtle_ws/
 catkin_make
 ```

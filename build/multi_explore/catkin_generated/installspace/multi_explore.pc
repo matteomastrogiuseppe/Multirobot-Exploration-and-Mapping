@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: multi_explore
+Description: Description of multi_explore
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: 

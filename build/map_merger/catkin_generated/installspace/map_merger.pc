@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: map_merger
+Description: Description of map_merger
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: roscpp rospy tf rtabmap_ros

@@ -60,7 +60,7 @@ def A_STAR(grid, dist_cost_map, p1, p2, k=1):
                     # Definition of the heuristic: first consider points which get closer to the end goal and stay far from obstacles
                     value[x,y] = value[cur_x,cur_y] + L + dist_cost               # Value function, keeps track of total cost of the path
                     cart_distance = np.sqrt( (p2[0]-x)**2 + (p2[1]-y)**2 )        # activate to get A*
-                    heuristic = value[x,y]  + cart_distance
+                    heuristic = value[x,y]  + cart_distance                       # Heuristic to get closer to the goal faster
                     # Insert this new point in the priority queue
                     heapq.heappush(priority_queue, (heuristic, (x, y)))
                     # Store the transition to retrieve the path 

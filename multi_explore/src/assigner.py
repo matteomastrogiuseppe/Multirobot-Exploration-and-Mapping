@@ -83,8 +83,10 @@ class TaskManager:
                 M[i,j] = info_gain + expl_cost + change_cost
 
                 # If robot is too close, it likely cannot scan that area (use of RGB-D)
+                # But there is also no need for another robot to go there, close robot will soon turn
+                # around to visit that frontier
                 if ((robot.pose.x-fx)**2 + (robot.pose.y-fy)**2) < 0.25: 
-                    M[i,j] = -np.nan
+                    M[:,j] = -np.nan
         return M
     
     def assigner(self):

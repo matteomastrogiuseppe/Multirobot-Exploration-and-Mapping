@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>map_merger</name>
+  <version>0.0.0</version>
+  <description>The map_merger package. Based on Jacob Olson's work. </description>
+  <maintainer email="dontremember@gmail.com">DanieleSerafini</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>rospy</depend>
+  <depend>rtabmap_ros</depend>
+  <depend>cmake_modules</depend>  
+  <export>
+
+  </export>
+</package>

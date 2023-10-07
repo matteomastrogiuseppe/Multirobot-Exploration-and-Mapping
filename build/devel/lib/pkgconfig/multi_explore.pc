@@ -1,8 +1,0 @@
-prefix=/home/matteo/final_ws/src/build/devel
-
-Name: multi_explore
-Description: Description of multi_explore
-Version: 0.0.0
-Cflags: -I/home/matteo/final_ws/src/build/devel/include
-Libs: -L${prefix}/lib 
-Requires: 

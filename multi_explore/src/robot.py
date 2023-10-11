@@ -77,7 +77,6 @@ class Robot:
         grid_img = (255 - map > 40).astype(int).astype(float)
 
         #plt.imshow(grid_img[130:290, 130:290])
-        np.save("test",grid_img[130:290, 130:290])
 
         # Convert /map coordinates to pixel coordinates
         p1 = pose_to_pixel(self.pose, map_info)

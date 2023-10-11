@@ -3,3 +3,4 @@
 *.bib linguist-vendored
 *.tex linguist-vendored
 *.bst linguist-vendored
+*.pptx linguist-vendored
